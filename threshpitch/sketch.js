@@ -20,9 +20,21 @@
  * 
  */
 
+/*
+delta bpm formula:
+deltaTime = ((bpm/60)/subdivision) * 1000
+
+MAKE SURE CONSOLE VIEW IS ON FOR RHTYHMIC FEEDBACK
+
+*/
+
+
 var source, fft, lowPass;
 
-var threshold = 0.05;
+
+
+
+var threshold = 0.05;//alter amplitude threshold
 var cutoff = 0;
 var decayRate = 0.95;
 //array of absolute fundamentals
@@ -30,8 +42,44 @@ var fundFreqs = [16.35, 17.32, 18.35, 19.45, 20.60, 21.83, 23.12, 24.50, 25.96, 
 //array of corresponding notes
 var pitches =   ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"] 
 
+//test pitch
+var pitch1 = "A#";
+
+//our note
+var noteDis = "empty";
+
+var audioContext = null;//used for oscillators
+
+var startTime = null;//used to calibrate timestamp array
+var runningAccepted = null;//used as a running timestamp to be reinserted in the timestamp array
+
+var hasScored = false;//rhtyhmic score check
+var isCountingIn = true;//are we countingin? don't let any amplitude pass, the array is being calibrated
+var hasHit = null;//variable to account for dublicate hits
+
+var countingint = 1;//our countin starts at one
+
+/*
+*The BPM and subdivision system is completely dynamic between
+*the bpm, and subdivisions up to a sixteenth. Just make sure they make sense
+* For example: [2, 2, 1] would produce 2 eigthnotes and a quarter, ending on proper downbeats
+where as: [2,1] would produce an eigth and a quarter (ending on an upbeat), we dont want that type of uneven rhythm yet
+(though it would still work, its not optimal for testing)
+*/
+//EDIT BPM
+var bpm = 60;
+//EDIT SUBDIVISIONS
+// 1 = quarter, 2 = eigth, 4 = sixteenth
+var subdivisions = [2, 2, 1, 1, 1];//eigth, eigth, quarter, quarter, qarter (4 beats total)
 
 
+var metronomeTime = 1000;//i dont think this actually does anything
+
+var timeStampArray = null;//will be populated with timestamps
+var hitArrray = null;//timestamps that result in a rhythmic "hit"
+var divcounter = 0;
+var countInMetro;//metronome that controls the countin
+var rhythmicScore = null;
 // center clip nullifies samples below a clip amount
 var doCenterClip = false;
 var centerClipThreshold = 0.0;
@@ -45,6 +93,13 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   noFill();
 
+  audioContext = new AudioContext();
+
+  timeStampArray = new Array(subdivisions.length);
+  hitArrray = new Array(timeStampArray.length);
+
+  print(Date.now());
+
   source = new p5.AudioIn();
   source.start();
 
@@ -54,6 +109,10 @@ function setup() {
 
   fft = new p5.FFT();
   fft.setInput(lowPass);
+  //count in a series of quarter notes to be printed to the console
+  var countInTempo = (60/bpm)*1000;
+  countInMetro = setInterval(function() { counting(); }, countInTempo);
+  //StartMetronome();
 }
 
 function draw() {
@@ -63,8 +122,15 @@ function draw() {
   var timeDomain = fft.waveform(1024, 'float32');
   var corrBuff = autoCorrelate(timeDomain);
   
+
+
   //only run calculations if the source amplitude is above the threshold
 if(volume > threshold + cutoff){
+  if(!isCountingIn){//are we done counting in? start checking rhythm
+  var newTimeStamp = Date.now();
+  CheckTimestamp(newTimeStamp);
+}
+//FFT CODE
   beginShape();
   for (var i = 0; i < corrBuff.length; i++) {
     var w = map(i, 0, corrBuff.length, 0, width);
@@ -81,12 +147,25 @@ if(volume > threshold + cutoff){
   text ('Fundamental Frequency: ' + freq.toFixed(2), 20, 20); 
   line (0, height/2, width, height/2);
  
-  var noteDis = getNote(freq);
+ //FIND THE PITCH
+  noteDis = getNote(freq);
 
  
   text ('Note: ' + noteDis, 20, 50); 
   
+  
+  
 }
+
+if(hasScored){
+  fill(0);
+  if(rhythmicScore != null){
+  text('Rhythm Score: ' + rhythmicScore, 40, 70 ); //currently wont print if score = 0
+}
+}
+
+
+
 }
 
 
@@ -220,7 +299,7 @@ function getNote(frequency){
 			if(between(frequency, minval, maxval)){
 				//get the indexed pitch value against the matched index
 				var pitch = pitches[i];	
-				print(pitch);
+				//print(pitch);
 				return pitch;	
 				
 			}
@@ -239,6 +318,175 @@ function between(x, min, max){
 	return x>= min && x <= max;
 	
 }
+/* This method allows the player to set their tempo and triggers
+*all the calculations related to rythms. On the last beat of this count-in
+*a the timestamp array is populated, we gather our starting point and
+*the system knows that exactly one beat after is the first "timestamp"
+*to guage the player's rythm
+*/
+function counting(){
+  //The metronome is started on the first downbeat because of the order
+  //of operations inside of the StartMetronome() function. 
+  if(countingint == 5){
+    //print (countingint);
+    StartMetronome();
+    clearInterval(countInMetro);
+  }else if (countingint == 4){
+    print (countingint);
+    startTime = Date.now();
+    PopulateTimestamps();
+    isCountingIn = false;
+    countingint++;
+  }else{
+  print (countingint);
+  countingint++;
+}
+
+}
+/*
+*Start Metronome keeps track of the rhythmic pattern in the music, 
+*this is how the program knows when to stop accepting input and
+*score the player. Oscillators are present purely for reference
+*and testing the subdivision array. Oscillators should be commented out 
+during a live session and to preserve resources.
+*/
+function StartMetronome(){
+  //calculates the time of the current subdivision
+var deltaTime = ((60/bpm)/subdivisions[divcounter])*1000;
+var osc = audioContext.createOscillator();
+osc.connect( audioContext.destination );
+//print(Date.now());
+//print(divcounter);
+//print(deltaTime);
+if(subdivisions[divcounter] == 1){
+print("quarter");
+osc.frequency.value = 220.0;
+}
+if(subdivisions[divcounter] == 2){
+print("eigth");
+osc.frequency.value = 440.0;
+}
+if(subdivisions[divcounter] == 4){
+print("sixteenth");
+osc.frequency.value = 880.0;
+}
+//initial pitch matching experiment
+  if(noteDis == pitch1){
+  //print("got it!");
+  noteDis = "empty";
+
+}
+ 
+osc.start(audioContext.currentTime);
+osc.stop(audioContext.currentTime + 0.25);       
+
+    
+if (divcounter < subdivisions.length - 1){
+divcounter++;
+setTimeout(function(){StartMetronome();}, deltaTime);
+
+}else{
+  //gives the length of a quarter note before calculating the score, this is helpful if the player
+  //doesnt't play on the last beat
+  setTimeout(function(){RhythmScore();}, ((60/bpm)*1000));
+}
+}
+/*
+*This function isn't called anywhere in the code, not sure of its purpose right now
+*
+*/
+function ScanNotes(givenPitch, neededPitch){
+//print("called scan" + divcounter);
+
+if (divcounter <= subdivisions.length){
+divcounter++;
+StartMetronome();
+}
+if(givenPitch == neededPitch){
+  //print("got it!");
+  noteDis = "empty";
+}
+//clearInterval(metroCall);
+
+}
+/*
+*When the player's amplitude goes above a threshold, a call is made to Date.Now().
+*That number is then passed through this function and compared in a range of accepted values.
+*If it falls within a range based on the array of accepted time stamps, it is marked as a hit.
+*/
+
+function CheckTimestamp(givenTime){
+for(var i = 0; i < timeStampArray.length; i++){
+  var mintime = timeStampArray[i]-50;
+  var maxtime = timeStampArray[i]+50;
+  if (between(givenTime, mintime, maxtime) && hasHit != i){
+    hasHit = i; //this timestamp is marked as a hit
+    hitArrray[i] = "hit";
+    //WHEN USING THIS DATA FOR VISUALS HIT WOULD BE RETURNED INSTEAD OF PRINTED TO THE CONSOLE
+    print(i);
+    print("hit!");
+    break;
+    //right now misses do not punish the player
+  }else if(i< timeStampArray.length && givenTime < timeStampArray[i+1]){
+    //print(i);
+    //print("missed!");
+    break;
+  }else if(i == timeStampArray.length - 1){
+    //print("missed!");
+    //print(i);
+    break;
+  }
+
+}
+
+}
+/*Each time stamp must correspond to the time difference of the previous, the
+*time difference of a notes appearance in a piece of music corresponds to the 
+*delta of the subdivision before it. For example, 2 eighth notes followed by a quarter.
+*Though our subdivison array would read [2, 2, 1], it would take the length of an eightnote 
+*for the quarter to sound, not the length of a quarter. 
+*/
+
+
+function PopulateTimestamps(){
+  runningAccepted = startTime;
+  for(var i = 0; i < subdivisions.length; i++){
+    if(i>0){
+      var deltaTime = ((60/bpm)/subdivisions[i-1])*1000;
+    }else{
+      var deltaTime = ((60/bpm)/1)*1000;
+    }
+   runningAccepted += deltaTime;
+   timeStampArray[i] = runningAccepted;
+   //print(i);
+   //print(timeStampArray[i]);
+
+  }
+
+}
+/*
+*Calculates rhythm score based on the number of "hits" in the array versus the array length
+*
+*/
+
+function RhythmScore(){
+  var score = 0;
+for(var i = 0; i < hitArrray.length; i++){
+  if(hitArrray[i] == "hit"){
+    score++;
+    hasScored = true;
+    //print(score);
+  }
+}
+rhythmicScore = score/hitArrray.length * 100;
+print(rhythmicScore);
+}
+
+
+
+
+
+
 
 
 	
