@@ -99,6 +99,8 @@ var centerClipThreshold = 0.0;
 var preNormalize = true;
 var postNormalize = true;
 
+var freq;
+
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -110,10 +112,13 @@ function setup() {
   hitArrray = new Array(timeStampArray.length);
   hitPitches = new Array(acceptedPitches.length);
 
-  print(Date.now());
+  print('date: '+Date.now());
 
   source = new p5.AudioIn();
+  //source.getSources();
   source.start();
+
+  console.log(source);
 
   lowPass = new p5.LowPass();
   lowPass.disconnect();
@@ -137,6 +142,7 @@ function draw() {
 
 
   //only run calculations if the source amplitude is above the threshold
+<<<<<<< HEAD:threshpitch/sketch.js
 if(volume > threshold + cutoff){
 
 //FFT CODE
@@ -190,9 +196,90 @@ if(hasPitchScored){
 }
 }
 
+||||||| merged common ancestors
+if(volume > threshold + cutoff){
+  if(!isCountingIn){//are we done counting in? start checking rhythm
+  var newTimeStamp = Date.now();
+  CheckTimestamp(newTimeStamp);
+}
+//FFT CODE
+  beginShape();
+  for (var i = 0; i < corrBuff.length; i++) {
+    var w = map(i, 0, corrBuff.length, 0, width);
+    var h = map(corrBuff[i], -1, 1, height, 0);
+    curveVertex(w, h);
+  }
+  endShape();
 
+  fill(0);
+  //text ('Center Clip: ' + centerClipThreshold, 20, 20); 
+  //line (0, height/2, width, height/2);
+	
+  var freq = findFrequency(corrBuff);
+  text ('Fundamental Frequency: ' + freq.toFixed(2), 20, 20); 
+  line (0, height/2, width, height/2);
+ 
+ //FIND THE PITCH
+  noteDis = getNote(freq);
 
+ 
+  text ('Note: ' + noteDis, 20, 50); 
+  
+  
+  
+}
 
+if(hasScored){
+  fill(0);
+  if(rhythmicScore != null){
+  text('Rhythm Score: ' + rhythmicScore, 40, 70 ); //currently wont print if score = 0
+}
+}
+
+=======
+  if(volume > threshold + cutoff){
+    if(!isCountingIn){//are we done counting in? start checking rhythm
+      var newTimeStamp = Date.now();
+      CheckTimestamp(newTimeStamp);
+    }
+>>>>>>> master:threshpitch/sketch_sound.js
+
+    //FFT CODE
+    beginShape();
+    for (var i = 0; i < corrBuff.length; i++) {
+      var w = map(i, 0, corrBuff.length, 0, width);
+      var h = map(corrBuff[i], -1, 1, height, 0);
+      curveVertex(w, h);
+    }
+    endShape();
+
+    fill(0);
+    //text ('Center Clip: ' + centerClipThreshold, 20, 20); 
+    //line (0, height/2, width, height/2);
+  	
+    freq = findFrequency(corrBuff);
+    text ('Fundamental Frequency: ' + freq.toFixed(2), 20, 20); 
+    line (0, height/2, width, height/2);
+   
+   //FIND THE PITCH
+    noteDis = getNote(freq);
+   
+    text ('Note: ' + noteDis, 20, 50); 
+  }
+
+<<<<<<< HEAD:threshpitch/sketch.js
+
+||||||| merged common ancestors
+}
+=======
+  if(hasScored){
+    fill(0);
+    if(rhythmicScore != null){
+      text('Rhythm Score: ' + rhythmicScore, 40, 70 ); //currently wont print if score = 0
+    }
+  }
+}
+>>>>>>> master:threshpitch/sketch_sound.js
 
 
 
