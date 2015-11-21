@@ -90,9 +90,13 @@ var postNormalize = true;
 
 var freq;
 
+//timer for listening and sending to sketch_visuals.js
+var startTimeListenNote;
+var timerListenNote = 50;
+
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
+  noCanvas();
   noFill();
 
   audioContext = new AudioContext();
@@ -118,10 +122,12 @@ function setup() {
   var countInTempo = (60/bpm)*1000;
   countInMetro = setInterval(function() { counting(); }, countInTempo);
   //StartMetronome();
+
+  timerListenNote = 50;
 }
 
 function draw() {
-  background(200);
+  // background(200);
   var volume = source.getLevel();
   // array of values from -1 to 1
   var timeDomain = fft.waveform(1024, 'float32');
@@ -137,26 +143,37 @@ function draw() {
     }
 
     //FFT CODE
-    beginShape();
-    for (var i = 0; i < corrBuff.length; i++) {
-      var w = map(i, 0, corrBuff.length, 0, width);
-      var h = map(corrBuff[i], -1, 1, height, 0);
-      curveVertex(w, h);
-    }
-    endShape();
+    // beginShape();
+    // for (var i = 0; i < corrBuff.length; i++) {
+    //   var w = map(i, 0, corrBuff.length, 0, width);
+    //   var h = map(corrBuff[i], -1, 1, height, 0);
+    //   curveVertex(w, h);
+    // }
+    // endShape();
 
-    fill(0);
+    // fill(0);
     //text ('Center Clip: ' + centerClipThreshold, 20, 20); 
     //line (0, height/2, width, height/2);
   	
     freq = findFrequency(corrBuff);
-    text ('Fundamental Frequency: ' + freq.toFixed(2), 20, 20); 
-    line (0, height/2, width, height/2);
+    // text ('Fundamental Frequency: ' + freq.toFixed(2), 20, 20); 
+    // line (0, height/2, width, height/2);
    
    //FIND THE PITCH
+
+   //todo: average out / broader range of acceptable notes to account for imperfection/stutter?
     noteDis = getNote(freq);
+
+    if(noteDis == "A"){
+      if(millis() - startTimeListenNote > timerListenNote){
+        correctNote(noteDis);
+        //handle sustained note
+      }
+    }else{
+      startTimeListenNote = millis();
+    }
    
-    text ('Note: ' + noteDis, 20, 50); 
+    // text ('Note: ' + noteDis, 20, 50); 
   }
 
   if(hasScored){

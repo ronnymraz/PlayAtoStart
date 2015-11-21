@@ -4,7 +4,8 @@ var path = require('path');
 
 var app = express();
 
-app.set('port', 80);
+//---- port 2046 is for localhost, use port 80 when pushing to remote host
+app.set('port', 2045);
 app.use(express.static(path.join(__dirname,'public')));
 
 // ---- create server

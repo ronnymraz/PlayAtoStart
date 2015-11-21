@@ -2,10 +2,16 @@ var v = function(p){
 	var w = 100;
 	var h = 100;
 
+	var canDebug = false;
+
 	var squaresNum = 10;
 	var squares = [];
 	var polygons = [];
 	var canChange = [];
+
+	var startTimeCorrectNote = p.millis();
+	//only draw a new note every given interval
+	var timerCorrectNote = 1000;
 
 	var Square = function(){
 		this.rotation = Math.random()*Math.PI*2;
@@ -75,8 +81,41 @@ var v = function(p){
 		}
 	}
 
+	correctNote = function(note){
+		console.log('correct note');
+		if(p.millis() - startTimeCorrectNote > timerCorrectNote){
+			var index = pickRandomIndex();
+			canChange[index] = true;
+			startTimeCorrectNote = p.millis();
+		}
+	}
+
+	pickRandomIndex = function(){
+		var i = Math.floor(Math.random()*canChange.length);
+		if(canChange[i] == true){
+			i = pickRandomIndex();
+		}
+
+		return i;
+	}
+
+	debug = function(){
+		p.fill(255);
+		p.text ('note: ' + noteDis, 20 - p.windowWidth*0.5, 20 - p.windowHeight*0.5);
+		p.text('current draw interval: ' + timerCorrectNote, 20 - p.windowWidth*0.5, 30 - p.windowHeight*0.5);
+		p.text('current listen interval: ' + timerListenNote, 20 - p.windowWidth*0.5, 40 - p.windowHeight*0.5);
+	}
+
+	instructions = function(){
+		p.fill(255);
+		p.textAlign(p.RIGHT);
+		p.text ('reset - r', - 20 + p.windowWidth*0.5, 20 - p.windowHeight*0.5);
+		// p.text('current draw interval: ' + timerCorrectNote, 20 - p.windowWidth*0.5, 30 - p.windowHeight*0.5);
+		// p.text('current listen interval: ' + timerListenNote, 20 - p.windowWidth*0.5, 40 - p.windowHeight*0.5);
+	}
+
 	p.setup = function(){
-		var cnv = p.createCanvas(p.windowWidth, 400);
+		var cnv = p.createCanvas(p.windowWidth, p.windowHeight);
 
 		for(var i = 0; i < squaresNum; i++){
 			squares[i] = new Square();
@@ -91,14 +130,22 @@ var v = function(p){
 		p.fill(200);
 		p.translate(p.width*0.5, p.height*0.5);
 		for(var i = 0; i < squares.length; i++){
-			//squares[i].show();
-			polygons[i].show();
+			squares[i].show();
+			//polygons[i].show();
 			if(canChange[i]){
 				squares[i].changeColor();
 				polygons[i].changeColor();
 			}
 		}
-		//text ('Fundamental Frequency: ' + freq.toFixed(2), 20, 20); 
+
+		p.fill(200);
+		p.text('click', 0, -p.windowHeight*0.5 + 20);
+
+		if(canDebug){
+			debug();
+			instructions();
+		}
+			
 	};
 
 	p.keyPressed = function(){
@@ -106,6 +153,10 @@ var v = function(p){
 			var i = Math.floor(Math.random()*canChange.length);
 			canChange[i] = true;
 		}
+	}
+
+	p.mousePressed = function(){
+		canDebug = !canDebug;
 	}
 }
 
