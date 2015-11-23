@@ -82,7 +82,7 @@ where as: [2,1] would produce an eigth and a quarter (ending on an upbeat), we d
 var bpm = 60;
 //EDIT SUBDIVISIONS
 // 1 = quarter, 2 = eigth, 4 = sixteenth
-var subdivisions = [1, 1, 1.3, 4, 1, 1];//eigth, eigth, quarter, quarter, qarter (4 beats total)
+var subdivisions = [1, 1, 1, 1];//eigth, eigth, quarter, quarter, qarter (4 beats total)
 //EDIT ACCEPTED PITCHEST
 var acceptedPitches = ["A", "C"];
 /*
@@ -180,7 +180,7 @@ function draw() {
    //todo: average out / broader range of acceptable notes to account for imperfection/stutter?
    //SEE COMPARE NOTES FUNCTION
    noteDis = getNote(freq);
-   if(!isCountingIn && !playExample){//are we done counting in? start checking rhythm
+   if(!isCountingIn && !playExample && !hasScored){//are we done counting in? start checking rhythm
       var newTimeStamp = Date.now();
       CheckTimestamp(newTimeStamp, noteDis);
     }
@@ -211,31 +211,32 @@ function draw() {
  //FIND THE PITCH
  
 
- noteDis = getNote(freq);
- 
-  
-  
-//}
+   noteDis = getNote(freq);
+   
+    
+    
+  //}
 
-if(hasScored){
-  fill(0);
-  if(rhythmicScore != null){
-  text('Rhythm Score: ' + rhythmicScore, 40, 70 ); //currently wont print if score = 0
-}
-else{
- text('Rhythm Score: ' + 0, 40, 70 );
-}
-}
-if(hasPitchScored){
-  fill(0);
-  if(pitchBasedScore!= null){
-    text('Pitch Score: ' + pitchBasedScore, 40, 90);
-    text('Missed Pitches: ' + missedPitch, 40, 110);
-  }else{
-    text('Pitch Score: ' + 0, 40, 90);
-    text('Missed Pitches: ' + missedPitch, 40, 110);
+  if(hasScored){
+    fill(0);
+    if(rhythmicScore != null){
+      text('Rhythm Score: ' + rhythmicScore, 40, 70 ); //currently wont print if score = 0
+    }
+    else{
+     text('Rhythm Score: ' + 0, 40, 70 );
+    }
   }
-}
+    if(hasPitchScored){
+      fill(0);
+      if(pitchBasedScore!= null){
+        text('Pitch Score: ' + pitchBasedScore, 40, 90);
+        text('Missed Pitches: ' + missedPitch, 40, 110);
+      }
+      else{
+        text('Pitch Score: ' + 0, 40, 90);
+        text('Missed Pitches: ' + missedPitch, 40, 110);
+      }
+    }
 }
 
 
@@ -402,6 +403,9 @@ function between(x, min, max){
 *to guage the player's rythm
 */
 function counting(){
+  var osc = audioContext.createOscillator();
+  osc.connect( audioContext.destination );
+  osc.frequency.value = 1000;
   //The metronome is started on the first downbeat because of the order
   //of operations inside of the StartMetronome() function. 
   if(countingint == 5){
@@ -409,13 +413,17 @@ function counting(){
     StartMetronome();
     clearInterval(countInMetro);
   }else if (countingint == 4){
-    print (countingint);
+    print ("Count in: " + countingint);
+    osc.start(audioContext.currentTime);
+    osc.stop(audioContext.currentTime + 0.25); 
     startTime = Date.now();
     PopulateTimestamps();
     isCountingIn = false;
     countingint++;
   }else{
-    print (countingint);
+    print ("Count in: " + countingint);
+    osc.start(audioContext.currentTime);
+    osc.stop(audioContext.currentTime + 0.25); 1
     countingint++;
   }
 
@@ -429,38 +437,40 @@ during a live session and to preserve resources.
 */
 function StartMetronome(){
   //calculates the time of the current subdivision
-  var deltaTime = ((60/bpm)/subdivisions[divcounter])*1000 - 30;
+  var deltaTime = ((60/bpm)/subdivisions[divcounter])*1000 - 50;
   var osc = audioContext.createOscillator();
   osc.connect( audioContext.destination );
-//print(Date.now());
-//print(divcounter);
-//print(deltaTime);
-if(playExample){
-  var randomNote = Math.floor(Math.random()*((acceptedPitches.length - 1) + 1)) + 0;
-  var playNote = playFrequencies[acceptedPitches[randomNote]];
-  print(playNote);
-  if(subdivisions[divcounter] == 1){
-    print("quarter");
-    osc.frequency.value = playNote;
-  }
-  if(subdivisions[divcounter] == 2){
-    print("eigth");
-    osc.frequency.value = playNote;
-  }
-  if(subdivisions[divcounter] == 4){
-    print("sixteenth");
-    osc.frequency.value = playNote;
-  }
-  osc.start(audioContext.currentTime);
-  osc.stop(audioContext.currentTime + 0.25); 
-}      
+  //print(Date.now());
+  //print(divcounter);
+  //print(deltaTime);
+  //ONLY PLAY OSCILLATORS TO DEMONSTRATE RHYTHM AND AVAILABLE PITCHES
+  if(playExample){
+    var randomNote = Math.floor(Math.random()*((acceptedPitches.length - 1) + 1)) + 0;
+    var playNote = playFrequencies[acceptedPitches[randomNote]];
+    print(playNote);
+    if(subdivisions[divcounter] == 1){
+      print("quarter");
+      osc.frequency.value = playNote;
+    }
+    if(subdivisions[divcounter] == 2){
+      print("eigth");
+      osc.frequency.value = playNote;
+    }
+    if(subdivisions[divcounter] == 4){
+      print("sixteenth");
+      osc.frequency.value = playNote;
+    }
+    osc.start(audioContext.currentTime);
+    osc.stop(audioContext.currentTime + 0.25); 
+  }      
 
 
 if (divcounter < subdivisions.length - 1){
   divcounter++;
   setTimeout(function(){StartMetronome();}, deltaTime);
 
-}else{
+}
+else{
   //gives the length of a quarter note before calculating the score, this is helpful if the player
   //doesnt't play on the last beat
   if(playExample){
@@ -470,7 +480,8 @@ if (divcounter < subdivisions.length - 1){
       divcounter = 0;
       var countInTempo = (60/bpm)*1000;
       countInMetro = setInterval(function() { counting(); }, countInTempo);
-    }else{
+    }
+    else{
       setTimeout(function(){PRScores();}, ((60/bpm)*1000));
     }
 
@@ -482,26 +493,20 @@ if (divcounter < subdivisions.length - 1){
 */
 function CompareNote(givenPitch){
   print(givenPitch);
-  print(lastPitch);
- // if(givenPitch != lastPitch){
-    //lastPitch = givenPitch;
-    print("calledPitchLOop");
-    for(var i = 0; i < acceptedPitches.length; i ++){
-      if(givenPitch == acceptedPitches[i] && hitPitches[i] != "hit"){
-        hitPitches[i] = "hit";
-    //DO CORRECT NOTE THINGS HERE
-    //return;
-    break;
-  }else if(givenPitch == acceptedPitches[i] && hitPitches[i] == "hit"){
+    //print("calledPitchLOop");
+  for(var i = 0; i < acceptedPitches.length; i ++){
+    if(givenPitch == acceptedPitches[i] && hitPitches[i] != "hit"){
+      hitPitches[i] = "hit";
+      //DO CORRECT NOTE THINGS HERE
+      //return;
+      break;
+    }
+    else if(givenPitch == acceptedPitches[i] && hitPitches[i] == "hit"){
       //ALSO HERE
       //return;
       break;
     }
   }
-
-//}
-
-
 }
 
 
@@ -512,33 +517,35 @@ function CompareNote(givenPitch){
 */
 
 function CheckTimestamp(givenTime, givenPitch){
-  print("CheckTimestamp");
+  //print("CheckTimestamp");
   for(var i = 0; i < timeStampArray.length; i++){
     var mintime = timeStampArray[i]-70;
     var maxtime = timeStampArray[i]+70;
     if (between(givenTime, mintime, maxtime) && hasHit != i){
-    hasHit = i; //this timestamp is marked as a hit
-    hitArrray[i] = "hit";
-    //print(givenTime);
-    //print(timeStampArray[i]);
-    //WHEN USING THIS DATA FOR VISUALS HIT WOULD BE RETURNED INSTEAD OF PRINTED TO THE CONSOLE
-    print(i);
-    print("hit!");
-    CompareNote(givenPitch);
-    break;
+      hasHit = i; //this timestamp is marked as a hit
+      hitArrray[i] = "hit";
+      //print(givenTime);
+      //print(timeStampArray[i]);
+      //WHEN USING THIS DATA FOR VISUALS HIT WOULD BE RETURNED INSTEAD OF PRINTED TO THE CONSOLE
+      print(i);
+      print("hit!");
+      CompareNote(givenPitch);
+      break;
     //right now misses do not punish the player
-  }else if(i< timeStampArray.length && givenTime < timeStampArray[i+1]){
-    //print(i);
-    //print("missed!");
-    //CompareNote(givenPitch);
-    break;
-  }else if(i == timeStampArray.length - 1){
-    //print("missed!");
-    //print(i);
-    break;
-  }
+    }
+    else if(i< timeStampArray.length && givenTime < timeStampArray[i+1]){
+      //print(i);
+      //print("missed!");
+      //CompareNote(givenPitch);
+      break;
+    }
+    else if(i == timeStampArray.length - 1){
+      //print("missed!");
+      //print(i);
+      break;
+    }
 
-}
+  }
 
 }
 /*Each time stamp must correspond to the time difference of the previous, the
@@ -554,7 +561,8 @@ function PopulateTimestamps(){
   for(var i = 0; i < subdivisions.length; i++){
     if(i>0){
       var deltaTime = ((60/bpm)/subdivisions[i-1])*1000;
-    }else{
+    }
+    else{
       var deltaTime = ((60/bpm)/1)*1000;
     }
     runningAccepted += deltaTime;
@@ -562,7 +570,7 @@ function PopulateTimestamps(){
    //print(i);
    //print(timeStampArray[i]);
 
- }
+  }
 
 }
 /*
@@ -577,10 +585,10 @@ function RhythmScore(){
       score++;
       hasScored = true;
     //print(score);
+    }
   }
-}
-rhythmicScore = score/hitArrray.length * 100;
-print(rhythmicScore);
+  rhythmicScore = score/hitArrray.length * 100;
+  print(rhythmicScore);
 }
 
 function PitchScore(){
@@ -591,21 +599,16 @@ function PitchScore(){
       pScore++;
       hasPitchScored = true;
     //print(score);
-  }else{
-    //keeps track of the pitches the user missed to give valuable feedback
-    missedPitch += hitPitches[i] + " ";
-  }
+    }
+    else{
+      //keeps track of the pitches the user missed to give valuable feedback
+      missedPitch += acceptedPitches[i] + " ";
+    }
   
-}
-pitchBasedScore = pScore/acceptedPitches.length * 100;
-print(pitchBasedScore);
-/*
-for(var i = 0; i< wrongPitches.length; i++){
-  wrongPitch += wrongPitches[i];
-}
-
-print(wrongPitch);
-*/
+  }
+  pitchBasedScore = pScore/acceptedPitches.length * 100;
+  print(pitchBasedScore);
+  print("Missed Pitches: " + missedPitch);
 }
 
 function PRScores(){
