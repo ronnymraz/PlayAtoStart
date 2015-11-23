@@ -47,7 +47,7 @@ var totalPitches = 0;
 var lastPitch = "###";
 
 var wrongPitches = [];
-var wrongPitch = ""
+var missedPitch = ""
 //test pitch
 
 //our note
@@ -190,8 +190,10 @@ if(hasPitchScored){
   fill(0);
   if(pitchBasedScore!= null){
     text('Pitch Score: ' + pitchBasedScore, 40, 90);
+    text('Missed Pitches: ' + missedPitch, 40, 110);
   }else{
     text('Pitch Score: ' + 0, 40, 90);
+    text('Missed Pitches: ' + missedPitch, 40, 110);
   }
 }
 }
@@ -437,7 +439,7 @@ lastPitch = givenPitch;
 print("calledPitchLOop");
 for(var i = 0; i < acceptedPitches.length; i ++){
   if(givenPitch == acceptedPitches[i] && hitPitches[i] != "hit"){
-    print("got it!");
+    //print("got it!");
     hitPitches[i] = "hit";
     //pitchHit++;
     return;
@@ -445,7 +447,7 @@ for(var i = 0; i < acceptedPitches.length; i ++){
       return;
     }
   }
-  
+  /*
 if(givenPitch != acceptedPitches[i]){
   if(wrongPitches.length == 0){
     wrongPitches.push(givenPitch)
@@ -460,6 +462,7 @@ if(givenPitch != acceptedPitches[i]){
   wrongPitches.push(givenPitch);
 
 }
+*/
 }
 
 //clearInterval(metroCall);
@@ -489,7 +492,7 @@ for(var i = 0; i < timeStampArray.length; i++){
   }else if(i< timeStampArray.length && givenTime < timeStampArray[i+1]){
     //print(i);
     //print("missed!");
-    CompareNote(givenPitch);
+    //CompareNote(givenPitch);
     break;
   }else if(i == timeStampArray.length - 1){
     //print("missed!");
@@ -550,15 +553,20 @@ for(var i = 0; i < hitPitches.length; i++){
     pScore++;
     hasPitchScored = true;
     //print(score);
+  }else{
+    missedPitch += hitPitches[i] + " ";
   }
   
 }
 pitchBasedScore = pScore/acceptedPitches.length * 100;
 print(pitchBasedScore);
+/*
 for(var i = 0; i< wrongPitches.length; i++){
   wrongPitch += wrongPitches[i];
 }
+
 print(wrongPitch);
+*/
 }
 
 function PRScores(){
