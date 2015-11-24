@@ -437,13 +437,18 @@ during a live session and to preserve resources.
 */
 function StartMetronome(){
   //calculates the time of the current subdivision
-  var deltaTime = ((60/bpm)/subdivisions[divcounter])*1000 - 50;
+  var deltaTime = ((60/bpm)/subdivisions[divcounter])*1000 - 50;//50 second offset to account for latency that occurs with the oscillators and these calculations
   var osc = audioContext.createOscillator();
   osc.connect( audioContext.destination );
   //print(Date.now());
   //print(divcounter);
   //print(deltaTime);
   //ONLY PLAY OSCILLATORS TO DEMONSTRATE RHYTHM AND AVAILABLE PITCHES
+  /**
+  *In order to play the accepted notes randomly, we return a random integer
+  *based on the length of the accepted notes array. We use that index to obtain
+  *the notes string from the accepted notes arrayand then use that key to retrieve the "play frequeny" from the ass. array "playFrequencies"
+  */
   if(playExample){
     var randomNote = Math.floor(Math.random()*((acceptedPitches.length - 1) + 1)) + 0;
     var playNote = playFrequencies[acceptedPitches[randomNote]];
