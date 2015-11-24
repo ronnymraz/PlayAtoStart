@@ -393,8 +393,8 @@ osc.frequency.value = 880.0;
 
 }
  
-osc.start(audioContext.currentTime);
-osc.stop(audioContext.currentTime + 0.25);       
+//osc.start(audioContext.currentTime);
+//osc.stop(audioContext.currentTime + 0.25);       
 
     
 if (divcounter < subdivisions.length - 1){
