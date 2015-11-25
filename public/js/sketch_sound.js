@@ -34,7 +34,7 @@ var source, fft, lowPass;
 
 
 
-var threshold = 0.2;//alter amplitude threshold
+var threshold = 0.1;//alter amplitude threshold
 var cutoff = 0;
 var decayRate = 0.95;
 //array of absolute fundamentals
@@ -48,11 +48,14 @@ var playFrequencies = {"C":261.63, "C#":277.18, "D":293.66, "D#":311.13,"E": 29.
 var hitPitches = null;
 var totalPitches = 0;
 var lastPitch = "###";
+var comparePitches = [];
 
 var playExample = true;
 
 var wrongPitches = [];
-var missedPitch = ""
+
+var rHasMissed = null;
+var rMissedArray;
 //test pitch
 
 //our note
@@ -82,9 +85,16 @@ where as: [2,1] would produce an eigth and a quarter (ending on an upbeat), we d
 var bpm = 60;
 //EDIT SUBDIVISIONS
 // 1 = quarter, 2 = eigth, 4 = sixteenth
-var subdivisions = [1, 1, 1, 1];//eigth, eigth, quarter, quarter, qarter (4 beats total)
+var subdivisions = {};
+subdivisions.subdivisions1 = [1, 1, 1, 1];
+subdivisions.subdivisions2 = [2, 2, 2, 2, 2, 2, 1];
+subdivisions.subdivisions3 = [2, 2, 1, 2, 2, 1];
+subdivisions.subdivisions4 = [1, 2, 2, 1, 1];
+var numSubdivisions = 3;
 //EDIT ACCEPTED PITCHEST
-var acceptedPitches = ["A", "C"];
+var acceptedPitches = ["G"];
+var pickDiv;
+var thisDiv;
 /*
 *
 */
@@ -116,10 +126,15 @@ function setup() {
   noFill();
 
   audioContext = new AudioContext();
-
-  timeStampArray = new Array(subdivisions.length);
+  pickDiv = Math.floor(Math.random()*((numSubdivisions) - 0)) + 1;
+  thisDiv = 'subdivisions' + pickDiv;
+  print(thisDiv);
+  print(subdivisions[thisDiv]);
+  print(subdivisions[thisDiv][1]);
+  timeStampArray = new Array(subdivisions[thisDiv].length);
   hitArrray = new Array(timeStampArray.length);
   hitPitches = new Array(acceptedPitches.length);
+  rMissedArray = new Array(timeStampArray.length);
 
   print('date: '+Date.now());
 
@@ -136,6 +151,7 @@ function setup() {
   fft = new p5.FFT();
   fft.setInput(lowPass);
   //count in a series of quarter notes to be printed to the console
+  
   var countInTempo = (60/bpm)*1000;
   countInMetro = setInterval(function() { counting(); }, countInTempo);
   //StartMetronome();
@@ -181,19 +197,12 @@ function draw() {
    //SEE COMPARE NOTES FUNCTION
    noteDis = getNote(freq);
    if(!isCountingIn && !playExample && !hasScored){//are we done counting in? start checking rhythm
+    //print("passsed threshold");
       var newTimeStamp = Date.now();
       CheckTimestamp(newTimeStamp, noteDis);
     }
 
   }
-   if(noteDis == "A"){
-    if(millis() - startTimeListenNote > timerListenNote){
-      correctNote(noteDis);
-        //handle sustained note
-      }
-    }else{
-      startTimeListenNote = millis();
-    }
     
     // text ('Note: ' + noteDis, 20, 50); 
      //text ('Note: ' + noteDis, 20, 50); 
@@ -202,8 +211,6 @@ function draw() {
   //text ('Center Clip: ' + centerClipThreshold, 20, 20); 
   //line (0, height/2, width, height/2);
   
-  var freq = findFrequency(corrBuff);
-  
   
   //text ('Fundamental Frequency: ' + freq.toFixed(2), 20, 20); 
   //line (0, height/2, width, height/2);
@@ -211,12 +218,12 @@ function draw() {
  //FIND THE PITCH
  
 
-   noteDis = getNote(freq);
+  
    
     
     
   //}
-
+  /*
   if(hasScored){
     fill(0);
     if(rhythmicScore != null){
@@ -225,7 +232,7 @@ function draw() {
     else{
      text('Rhythm Score: ' + 0, 40, 70 );
     }
-  }
+  }/*
     if(hasPitchScored){
       fill(0);
       if(pitchBasedScore!= null){
@@ -236,7 +243,8 @@ function draw() {
         text('Pitch Score: ' + 0, 40, 90);
         text('Missed Pitches: ' + missedPitch, 40, 110);
       }
-    }
+      */
+    
 }
 
 
@@ -423,7 +431,7 @@ function counting(){
   }else{
     print ("Count in: " + countingint);
     osc.start(audioContext.currentTime);
-    osc.stop(audioContext.currentTime + 0.25); 1
+    osc.stop(audioContext.currentTime + 0.25); 
     countingint++;
   }
 
@@ -437,7 +445,7 @@ during a live session and to preserve resources.
 */
 function StartMetronome(){
   //calculates the time of the current subdivision
-  var deltaTime = ((60/bpm)/subdivisions[divcounter])*1000 - 50;//50 second offset to account for latency that occurs with the oscillators and these calculations
+  var deltaTime = ((60/bpm)/subdivisions[thisDiv][divcounter])*1000 - 50;//50 second offset to account for latency that occurs with the oscillators and these calculations
   var osc = audioContext.createOscillator();
   osc.connect( audioContext.destination );
   //print(Date.now());
@@ -453,15 +461,15 @@ function StartMetronome(){
     var randomNote = Math.floor(Math.random()*((acceptedPitches.length - 1) + 1)) + 0;
     var playNote = playFrequencies[acceptedPitches[randomNote]];
     print(playNote);
-    if(subdivisions[divcounter] == 1){
+    if(subdivisions[thisDiv][divcounter] == 1){
       print("quarter");
       osc.frequency.value = playNote;
     }
-    if(subdivisions[divcounter] == 2){
+    if(subdivisions[thisDiv][divcounter] == 2){
       print("eigth");
       osc.frequency.value = playNote;
     }
-    if(subdivisions[divcounter] == 4){
+    if(subdivisions[thisDiv][divcounter] == 4){
       print("sixteenth");
       osc.frequency.value = playNote;
     }
@@ -470,9 +478,12 @@ function StartMetronome(){
   }      
 
 
-if (divcounter < subdivisions.length - 1){
+if (divcounter < subdivisions[thisDiv].length - 1){
   divcounter++;
   setTimeout(function(){StartMetronome();}, deltaTime);
+  if(!playExample){
+  setTimeout(function(){PRScores();}, 50);
+}
 
 }
 else{
@@ -487,7 +498,8 @@ else{
       countInMetro = setInterval(function() { counting(); }, countInTempo);
     }
     else{
-      setTimeout(function(){PRScores();}, ((60/bpm)*1000));
+      setTimeout(function(){PRScores();}, 100);
+      setTimeout(function(){NewSession();}, 300);
     }
 
   }
@@ -496,9 +508,12 @@ else{
 *Compares the given note against an array of accepted. If the note hit, we keep track
 *that it was hit in another array so we can know ifthe player as beat the level or not.
 */
-function CompareNote(givenPitch){
+function CompareNote(givenPitch, hasMissed){
   print(givenPitch);
     //print("calledPitchLOop");
+  if(hasMissed == rHasMissed){
+    return;
+  }
   for(var i = 0; i < acceptedPitches.length; i ++){
     if(givenPitch == acceptedPitches[i] && hitPitches[i] != "hit"){
       hitPitches[i] = "hit";
@@ -510,6 +525,10 @@ function CompareNote(givenPitch){
       //ALSO HERE
       //return;
       break;
+    }else{
+      //NOTHING HAPPENS
+      //print(hasMissed);
+      print("missed");
     }
   }
 }
@@ -534,21 +553,34 @@ function CheckTimestamp(givenTime, givenPitch){
       //WHEN USING THIS DATA FOR VISUALS HIT WOULD BE RETURNED INSTEAD OF PRINTED TO THE CONSOLE
       print(i);
       print("hit!");
-      CompareNote(givenPitch);
+      CompareNote(givenPitch, i);
       break;
     //right now misses do not punish the player
     }
     else if(i< timeStampArray.length && givenTime < timeStampArray[i+1]){
-      //print(i);
-      //print("missed!");
-      //CompareNote(givenPitch);
+      //print("called missed: " + i);
+        if(hitArrray[i] == "hit"){
+          break;
+        }
+        else if(rHasMissed == i){
+          break;
+        }
+        else if(i == timeStampArray.length - 1){
+          print("missed!");
+          print(i);
+          CompareNote(givenPitch, i);
+          rHasMissed = i;
+          break;
+        }
+        else{
+          print(i);
+          print("missed!");
+          CompareNote(givenPitch, i);
+          rHasMissed = i;  
+        }
       break;
     }
-    else if(i == timeStampArray.length - 1){
-      //print("missed!");
-      //print(i);
-      break;
-    }
+   
 
   }
 
@@ -563,9 +595,9 @@ function CheckTimestamp(givenTime, givenPitch){
 
 function PopulateTimestamps(){
   runningAccepted = startTime;
-  for(var i = 0; i < subdivisions.length; i++){
+  for(var i = 0; i < subdivisions[thisDiv].length; i++){
     if(i>0){
-      var deltaTime = ((60/bpm)/subdivisions[i-1])*1000;
+      var deltaTime = ((60/bpm)/subdivisions[thisDiv][i-1])*1000;
     }
     else{
       var deltaTime = ((60/bpm)/1)*1000;
@@ -588,7 +620,7 @@ function RhythmScore(){
   for(var i = 0; i < hitArrray.length; i++){
     if(hitArrray[i] == "hit"){
       score++;
-      hasScored = true;
+      //hasScored = true;
     //print(score);
     }
   }
@@ -598,11 +630,12 @@ function RhythmScore(){
 
 function PitchScore(){
   var pScore = 0;
+  var missedPitch = ""
   
   for(var i = 0; i < hitPitches.length; i++){
     if(hitPitches[i] == "hit"){
       pScore++;
-      hasPitchScored = true;
+      //hasPitchScored = true;
     //print(score);
     }
     else{
@@ -619,6 +652,29 @@ function PitchScore(){
 function PRScores(){
   RhythmScore();
   PitchScore();
+
+}
+function NewSession(){
+  if(rhythmicScore >= 75 && pitchBasedScore == 100){
+    print("Complete!")
+  }
+  else{
+    pickDiv = Math.floor(Math.random()*((numSubdivisions) - 0)) + 1;
+    thisDiv = 'subdivisions' + pickDiv;
+    print(thisDiv);
+    print(subdivisions[thisDiv]);
+    print(subdivisions[thisDiv][1]);
+    timeStampArray = new Array(subdivisions[thisDiv].length);
+    hitArrray = new Array(timeStampArray.length);
+    hitPitches = new Array(acceptedPitches.length);
+    rMissedArray = new Array(timeStampArray.length);
+    countingint = 1;
+    playExample = true;
+    isCountingIn = true;
+    divcounter = 0;
+    var countInTempo = (60/bpm)*1000;
+    countInMetro = setInterval(function() { counting(); }, countInTempo);
+    }
 
 }
 
