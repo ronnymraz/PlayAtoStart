@@ -103,7 +103,7 @@ subdivisions.subdivisions2 = [2, 2, 1, 2, 2, 1];
 subdivisions.subdivisions3 = [1, 2, 2, 1, 1];
 var numSubdivisions = 3;
 //EDIT ACCEPTED PITCHEST
-var acceptedPitches = ["G"];
+var acceptedPitches = ["A", "G"];
 var pickDiv;
 var thisDiv;
 /*
@@ -543,6 +543,7 @@ function CompareNote(givenPitch, hasMissed){
     if(TrackHitPitches(givenPitch) && hitPitches[i] != "hit"){
       hitPitches[i] = "hit";
       //DO CORRECT NOTE THINGS HERE
+      correctNote();
       //pitchHit[i]
       return;
       //break;
@@ -556,6 +557,8 @@ function CompareNote(givenPitch, hasMissed){
   }
   //NOTHING HAPPENS
   print("Pitch missed");
+
+  //TODO we need a way to bypass rhythm tracking for debug purposes
 }
 
 
