@@ -6,6 +6,10 @@ var v = function(p){
 	var down_beat_alpha = 100;
 	var beat_stroke = 1;
 
+	var handleNoteStartTime = p.millis();
+	var handleNoteTimer = 500; //wait half a second to listen for the second note
+	var canHandleNote = true;
+
 	var canDebug = false;
 
 	var squaresNum = 18;
@@ -14,9 +18,14 @@ var v = function(p){
 	var polygons = [];
 	var canChange = [];
 
+	var stroke_a = 0;
+	var stroke_g = 0;
+
 	var startTimeCorrectNote = p.millis();
 	//only draw a new note every given interval
 	var timerCorrectNote = 1000;
+
+	var notesHit = 0;
 
 	//possible rotations
 	Math.radians = function(degrees) {
@@ -30,7 +39,7 @@ var v = function(p){
 		possibleRotations[index] = i;
 		index++;
 	}
-	console.log('possible rotations:'+typeof possibleRotations);
+	//console.log('possible rotations:'+typeof possibleRotations);
 
 	
 
@@ -38,7 +47,6 @@ var v = function(p){
 		this.offset = offset;
 		this.rotation = possibleRotations[num];
 		this.oscillation = 0;
-		console.log(this.rotation);
 		this.globalRotationInc = 0.001;
 		this.positionX = (Math.random()+1)*600;
 		this.positionY = Math.random()*100;
@@ -67,7 +75,7 @@ var v = function(p){
 			p.push();
 			p.translate(this.offset, 0);
 			p.rotate(this.rotation);
-			//p.scale(0.25);
+			p.scale(0.5);
 			p.triangle(0, (Math.cos(this.oscillation)+4)*20, -this.dimension.x*0.75, this.dimension.y, this.dimension.x*0.75, this.dimension.y);
 			p.pop();
 		}
@@ -81,13 +89,14 @@ var v = function(p){
 			p.push();
 			p.translate(this.offset, 0);
 			p.rotate(this.rotation);
+			p.scale(0.5);
 			p.triangle(0, (Math.cos(this.oscillation)+4)*20, -this.dimension.x*0.75-(this.reactScaleVal*0.5), this.dimension.y+this.reactScaleVal, this.dimension.x*0.75+(this.reactScaleVal*0.5), this.dimension.y+this.reactScaleVal);
 			var middle = p.createVector(0, this.dimension.y);
 			//p.line(0, 0, middle.x, middle.y);
 			p.pop();
 
 			if(this.reactScaleVal < this.reactScaleThreshold){
-				this.reactScaleVal += this.reactScaleInc;
+				this.reactScaleVal += this.reactScaleInc*2;
 				this.reactAlpha -= this.reactScaleInc*2;
 			}
 		}
@@ -151,16 +160,25 @@ var v = function(p){
 
 	showProceed = function(){
 		document.getElementById('proceed').innerHTML = "great! let's test out the next level!";
+
+		//TODO all those crazy animations for the eye + making the monster white and colored and shit
 	}
 
 	handleCorrectNote = function(note){
 		if(canHandleNote){
 			console.log('handling correct note',note);
-			if(note == 'A')
-				canChange[pickRandomIndex()] = true;
 
-			if(note == 'G')
+			notesHit++;
+
+			if(note == 'A'){
 				canChange[pickRandomIndex()] = true;
+				stroke_a = 200;
+			}
+
+			if(note == 'G'){
+				canChange[pickRandomIndex()] = true;
+				stroke_g = 200;
+			}
 
 			canHandleNote = false;
 			handleNoteStartTime = p.millis();
@@ -191,6 +209,32 @@ var v = function(p){
 		p.text ('reset - r', - 20 + p.windowWidth*0.5, 20 - p.windowHeight*0.5);
 		// p.text('current draw interval: ' + timerCorrectNote, 20 - p.windowWidth*0.5, 30 - p.windowHeight*0.5);
 		// p.text('current listen interval: ' + timerListenNote, 20 - p.windowWidth*0.5, 40 - p.windowHeight*0.5);
+	}
+
+	drawNotes = function(){
+		p.textSize(18);
+		p.textAlign(p.CENTER, p.CENTER);
+		p.fill(150);
+		p.stroke(255, stroke_a);
+		p.strokeWeight(10);
+		p.rect(-p.width*0.45, -p.height*0.3, p.width*0.1, p.height*0.1);
+		p.fill(255);
+		p.noStroke();
+		p.text('A', -p.width*0.4, -p.height*0.25);
+
+		p.fill(150);
+		p.stroke(255, stroke_g);
+		p.strokeWeight(10);
+		p.rect(-p.width*0.325, -p.height*0.3, p.width*0.1, p.height*0.1);
+		p.fill(255);
+		p.noStroke();
+		p.text('G', -p.width*0.275, -p.height*0.25);
+
+		if(stroke_a > 0)
+			stroke_a -= 5;
+
+		if(stroke_g > 0)
+			stroke_g -= 5;
 	}
 
 	drawPoints = function(){
@@ -290,19 +334,21 @@ var v = function(p){
 		p.text('click', 0, -p.windowHeight*0.5 + 20);
 
 		drawBeat();
+		drawNotes();
 		drawBody();
 
 		p.scale(0.25);
-		for(var i = 0; i < squares.length; i++){
+		for(var i = 0; i < squaresNum; i++){
 
-			var allDone = true;
+			// var allDone = true;
+			console.log(canChange[i]);
 			if(canChange[i]){
 				// squares[i].changeColor();
 				// squares[i].react();
 				squaresRight[i].changeColor();
 				squaresRight[i].react();
 			}else{
-				allDone = false;
+				// allDone = false;
 			}
 
 			//squares[i].show();
@@ -317,7 +363,10 @@ var v = function(p){
 			instructions();
 		}
 
-		if(allDone)
+		if(p.millis() - handleNoteStartTime > handleNoteTimer)
+			canHandleNote = true;
+
+		if(notesHit == squaresRight.length)
 			showProceed();
 			
 	};
@@ -327,6 +376,10 @@ var v = function(p){
 			var i = Math.floor(Math.random()*canChange.length);
 			canChange[i] = true;
 		}
+
+		if(key == 'a' || key == 'A')
+			handleCorrectNote('A');
+
 	}
 
 	p.mousePressed = function(){

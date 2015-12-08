@@ -134,7 +134,7 @@ var startTimeListenNote;
 var timerListenNote = 50;
 
 //booleans for metronome and for rythm pattern check
-var tutorial = false;
+var tutorial = true;
 var canCount = true;
 var canCheckPattern = true;
 
@@ -448,7 +448,6 @@ function counting(){
     clearInterval(countInMetro);
 
   }else if (countingint == 4 && !mute){
-    print ("1.Count in: " + countingint);
       
     osc.start(audioContext.currentTime);
     osc.stop(audioContext.currentTime + 0.25); 
@@ -460,7 +459,6 @@ function counting(){
     countingint++;
 
   }else{
-    print ("2.Count in: " + countingint);
 
     if(countingint % 2 == 0){
       setDownBeat();
@@ -618,8 +616,7 @@ function CheckTimestamp(givenTime, givenPitch){
       //print(givenTime);
       //print(timeStampArray[i]);
       //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-WHEN USING THIS DATA FOR VISUALS HIT WOULD BE RETURNED INSTEAD OF PRINTED TO THE CONSOLE
-      print(i);
-      print("Rhythm hit!");
+      print("Rhythm hit at ",i);
       CompareNote(givenPitch, i);
       break;
     
@@ -633,15 +630,13 @@ function CheckTimestamp(givenTime, givenPitch){
           break;
         }
         else if(i == timeStampArray.length - 1){
-          print("Rhythm missed!");
-          print(i);
+          print("Rhythm missed! ", i);
           CompareNote(givenPitch, i);
           rHasMissed = i; //accounts for duplicates
           break;
         }
         else{
-          print(i);
-          print("Rhythm missed!");
+          print("Rhythm missed!",i);
           CompareNote(givenPitch, i);
           rHasMissed = i;  //accounts for duplicates
         }
@@ -694,7 +689,7 @@ function RhythmScore(){
   rhythmicScore = score/hitArrray.length * 100;
   
   totalRhythmScore += rhythmicScore;
-  print(rhythmicScore);
+  // print(rhythmicScore);
 
 }
 
