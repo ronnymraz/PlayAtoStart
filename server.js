@@ -17,5 +17,5 @@ http.createServer(app).listen(app.get('port'), function(){
 app.get('/', serveIndex);
 
 function serveIndex(req, res){
-	res.sendFile('index.html', {root: './public'});
+	res.sendFile('improv_triangles.html', {root: './public'});
 }
