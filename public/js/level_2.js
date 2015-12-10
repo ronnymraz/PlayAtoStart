@@ -73,9 +73,9 @@ var v = function(p){
 			p.noStroke();
 			p.rectMode(p.CENTER);
 			p.push();
-			p.translate(this.offset, 0);
+			p.translate(this.offset, -height*2);
 			p.rotate(this.rotation);
-			p.scale(0.5);
+			p.scale(1);
 			p.triangle(0, (Math.cos(this.oscillation)+4)*20, -this.dimension.x*0.75, this.dimension.y, this.dimension.x*0.75, this.dimension.y);
 			p.pop();
 		}
@@ -87,9 +87,9 @@ var v = function(p){
 			p.noStroke();
 			p.rectMode(p.CENTER);
 			p.push();
-			p.translate(this.offset, 0);
+			p.translate(this.offset, -height*2);
 			p.rotate(this.rotation);
-			p.scale(0.5);
+			p.scale(1);
 			p.triangle(0, (Math.cos(this.oscillation)+4)*20, -this.dimension.x*0.75-(this.reactScaleVal*0.5), this.dimension.y+this.reactScaleVal, this.dimension.x*0.75+(this.reactScaleVal*0.5), this.dimension.y+this.reactScaleVal);
 			var middle = p.createVector(0, this.dimension.y);
 			//p.line(0, 0, middle.x, middle.y);
@@ -121,14 +121,14 @@ var v = function(p){
 
 	drawBeat = function(){
 		p.strokeWeight(2);
-		p.stroke(150, beat_alpha);
+		p.stroke(250, beat_alpha);
 		p.noFill();
 		
 		for(var i = 0; i < 30; i++){
 			if(i % 2 == 0)
-				p.stroke(150, beat_alpha);
+				p.stroke(250, beat_alpha);
 			else
-				p.stroke(150, down_beat_alpha);
+				p.stroke(250, down_beat_alpha);
 
 			p.strokeWeight(2);
 			p.line(-p.width*0.5, p.height*0.5 + i*5 , p.width*0.5, p.height*0.5 + i*5);
@@ -147,14 +147,14 @@ var v = function(p){
 	drawCharacter = function(){
 		p.push();
 		p.translate(0, p.cos(p.millis()*0.0025)*10);
-		p.fill(230);
-		p.rect(-p.width*0.75, p.height*1.5, 300, 250);
+		p.fill(5, 254, 167);
+		p.rect(-p.width*0.75, p.height*1.77, 150, 100);
 
-		p.fill(200, 200, 250);
-		p.ellipse(-p.width*0.7, p.height*1.45, 100, 100);
+		p.fill(5, 204, 117);
+		p.ellipse(-p.width*0.72, p.height*1.77, 30, 30);
 		p.pop();
-		p.fill(230);
-		p.triangle(-p.width*0.75 - 125, p.height*2, -p.width*0.75 + 125, p.height*2, -p.width*0.75, p.height*1.75);
+		p.fill(5, 254, 167);
+		p.triangle(-p.width*0.75 - 60, p.height*2, -p.width*0.75 + 60, p.height*2, -p.width*0.75, p.height*1.85);
 		
 	}
 
@@ -170,12 +170,12 @@ var v = function(p){
 
 			notesHit++;
 
-			if(note == 'A'){
+			if(note == 'D'){
 				canChange[pickRandomIndex()] = true;
 				stroke_a = 200;
 			}
 
-			if(note == 'G'){
+			if(note == 'F'){
 				canChange[pickRandomIndex()] = true;
 				stroke_g = 200;
 			}
@@ -214,21 +214,21 @@ var v = function(p){
 	drawNotes = function(){
 		p.textSize(18);
 		p.textAlign(p.CENTER, p.CENTER);
-		p.fill(150);
+		p.fill(5, 184, 117);
 		p.stroke(255, stroke_a);
 		p.strokeWeight(10);
 		p.rect(-p.width*0.45, -p.height*0.3, p.width*0.1, p.height*0.1);
 		p.fill(255);
 		p.noStroke();
-		p.text('A', -p.width*0.4, -p.height*0.25);
+		p.text('D', -p.width*0.4, -p.height*0.25);
 
-		p.fill(150);
+		p.fill(5, 184, 117);
 		p.stroke(255, stroke_g);
 		p.strokeWeight(10);
 		p.rect(-p.width*0.325, -p.height*0.3, p.width*0.1, p.height*0.1);
 		p.fill(255);
 		p.noStroke();
-		p.text('G', -p.width*0.275, -p.height*0.25);
+		p.text('F', -p.width*0.275, -p.height*0.25);
 
 		if(stroke_a > 0)
 			stroke_a -= 5;
@@ -248,69 +248,27 @@ var v = function(p){
 	}
 
 	drawBody = function(){
-		p.fill(200);
 		p.noStroke();
+
 		//head
-		p.beginShape();
-		p.vertex(p.width*0.1, - p.height*0.05);
-		p.vertex(p.width*0.3, - p.height*0.255);
-		p.vertex(p.width*0.4, p.height*0.125);
-		p.vertex(p.width*0.18, p.height*0.25);
-		p.endShape(CLOSE);
-
-		//back
-		p.fill(100);
-		p.beginShape();
-		p.vertex(p.width*0.4, p.height*0.125);
-		p.vertex(p.width*0.375, p.height*0.145);
-		p.vertex(p.width*0.495, p.height*0.425);
-		p.endShape(CLOSE);
-
-		//torso top
-		p.fill(150);
-		p.beginShape();
-		p.vertex(p.width*0.375, p.height*0.145);
-		p.vertex(p.width*0.425, p.height*0.27);
-		p.vertex(p.width*0.375, p.height*0.425);
-		p.endShape(CLOSE);
-
-		//torso bottom
 		p.fill(180);
-		p.beginShape();
-		p.vertex(p.width*0.495, p.height*0.425);
-		p.vertex(p.width*0.426, p.height*0.27);
-		p.vertex(p.width*0.377, p.height*0.425);
-		p.endShape(CLOSE);
+		p.rect(-width*7, -height*2.5, width*14, height*5.85);
 
-		//leg front
-		p.fill(90);
-		p.beginShape();
-		p.vertex(p.width*0.400, p.height*0.525);
-		p.vertex(p.width*0.415, p.height*0.4275);
-		p.vertex(p.width*0.380, p.height*0.427);
-		p.endShape(CLOSE);
+		p.fill(0);
+		//mouth
+		p.rect(-width*1.5, height, width*3, height*1.1);
 
-		//leg back
-		p.fill(90);
-		p.beginShape();
-		p.vertex(p.width*0.450, p.height*0.525);
-		p.vertex(p.width*0.465, p.height*0.4275);
-		p.vertex(p.width*0.430, p.height*0.427);
-		p.endShape(CLOSE);
 
 		//teeth
-		p.fill(90);
+		p.fill(160);
 		p.beginShape();
-		p.vertex(p.width*0.185, p.height*0.2);
-		p.vertex(p.width*0.25, p.height*0.15);
-		p.vertex(p.width*0.26, p.height*0.19);
-		p.vertex(p.width*0.24, p.height*0.17);
-		p.vertex(p.width*0.235, p.height*0.205);
-		p.vertex(p.width*0.22, p.height*0.185);
-		p.vertex(p.width*0.215, p.height*0.215);
-		//last tooth
-		p.vertex(p.width*0.2, p.height*0.2);
-		p.vertex(p.width*0.2, p.height*0.23);
+		p.triangle(-width*1.5+60, height, -width*1.5+120, height, -width*1.5+80, height*1.4);//top left
+
+		p.triangle(-width*1.5+200, height, -width*1.5+250, height, -width*1.5+230, height*1.4);//top right
+
+		p.triangle(-width*1.5+20, height*2.1, -width*1.5+60, height*2.1, -width*1.5+50, height*1.7);//bottom left
+
+		p.triangle(-width*1.5+200, height*2.1, -width*1.5+260, height*2.1, -width*1.5+210, height*1.7);//bottom right
 		p.endShape(CLOSE);
 
 	}
@@ -319,39 +277,41 @@ var v = function(p){
 		var cnv = p.createCanvas(p.windowWidth, p.windowHeight);
 		cnv.position(0, 0);
 		for(var i = 0; i < squaresNum; i++){
-			squares[i] = new Square(i, -p.width*0);
-			squaresRight[i] = new Square(i, p.width);
+			squares[i] = new Square(i, -p.width*0.45);
+			squaresRight[i] = new Square(i, p.width*0.45);
 			canChange[i] = false;
 		}
 		
 	};
 
 	p.draw = function(){
-		p.background(250, 170, 185);
-		drawPoints();
+		p.background(120);
+		//drawPoints();
 		p.translate(p.width*0.5, p.height*0.35);
 		p.fill(0);
 		p.text('click', 0, -p.windowHeight*0.5 + 20);
 
-		drawBeat();
-		drawNotes();
+		
+		
 		drawBody();
+
+		drawNotes();
+		drawBeat();
 
 		p.scale(0.25);
 		for(var i = 0; i < squaresNum; i++){
 
 			// var allDone = true;
-			console.log(canChange[i]);
 			if(canChange[i]){
-				// squares[i].changeColor();
-				// squares[i].react();
+				squares[i].changeColor();
+				squares[i].react();
 				squaresRight[i].changeColor();
 				squaresRight[i].react();
 			}else{
 				// allDone = false;
 			}
 
-			//squares[i].show();
+			squares[i].show();
 			squaresRight[i].show();
 		}
 
