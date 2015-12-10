@@ -87,7 +87,7 @@ where as: [2,1] would produce an eigth and a quarter (ending on an upbeat), we d
 (though it would still work, its not optimal for testing)
 */
 //EDIT BPM
-var bpm = 80;
+var bpm = 60;
 //EDIT SUBDIVISIONS
 // 1 = quarter, 2 = eigth, 4 = sixteenth
 /* The subdivisions object will contain arrays of all the 
@@ -101,7 +101,7 @@ subdivisions.subdivisions2 = [2, 2, 1, 2, 2, 1];
 subdivisions.subdivisions3 = [1, 2, 2, 1, 1];
 var numSubdivisions = 3;
 //EDIT ACCEPTED PITCHEST
-var acceptedPitches = ["A", "G"];
+var acceptedPitches = ["D", "F"];
 var pickDiv;
 var thisDiv;
 /*
