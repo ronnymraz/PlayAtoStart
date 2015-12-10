@@ -32,8 +32,6 @@ MAKE SURE CONSOLE VIEW IS ON FOR RHTYHMIC FEEDBACK
 var source, fft, lowPass;
 
 
-
-
 var threshold = 0.1;//alter amplitude threshold
 var cutoff = 0;
 var decayRate = 0.95;
@@ -135,8 +133,20 @@ var freq;
 var startTimeListenNote;
 var timerListenNote = 50;
 
+//booleans for metronome and for rythm pattern check
+var tutorial = true;
+var canCount = true;
+var canCheckPattern = true;
+
+var mute = true;
+
 
 function setup() {
+  if(tutorial){
+    canCount = false;
+    canCheckPattern = false;
+  }
+
   noCanvas();
   noFill();
 
@@ -169,14 +179,21 @@ function setup() {
   //count in a series of quarter notes to be printed to the console
   
   var countInTempo = (60/bpm)*1000;
-  countInMetro = setInterval(function() { counting(); }, countInTempo);
-  //StartMetronome();
+  if(canCount)
+    countInMetro = setInterval(function() { counting(); }, countInTempo);
+
+  if(canCount)
+    StartMetronome();
 
   timerListenNote = 50;
 }
 
 function draw() {
-  // background(200);
+  if(tutorial){
+    canCount = false;
+    canCheckPattern = false;
+  }
+
   var volume = source.getLevel();
   // array of values from -1 to 1
   var timeDomain = fft.waveform(1024, 'float32');
@@ -186,69 +203,70 @@ function draw() {
 
   //only run calculations if the source amplitude is above the threshold
 
-
   if(volume > threshold + cutoff){
-
-
-    //FFT CODE
-    // beginShape();
-    // for (var i = 0; i < corrBuff.length; i++) {
-    //   var w = map(i, 0, corrBuff.length, 0, width);
-    //   var h = map(corrBuff[i], -1, 1, height, 0);
-    //   curveVertex(w, h);
-    // }
-    // endShape();
-
-    // fill(0);
-    // text ('Center Clip: ' + centerClipThreshold, 20, 20); 
-    // line (0, height/2, width, height/2);
     
     freq = findFrequency(corrBuff);
-    // text ('Fundamental Frequency: ' + freq.toFixed(2), 20, 20); 
-    // line (0, height/2, width, height/2);
+
     
    //FIND THE PITCH
 
    //todo: average out / broader range of acceptable notes to account for imperfection/stutter?
    //SEE COMPARE NOTES FUNCTION
    noteDis = getNote(freq);
-   if(!isCountingIn && !playExample && !hasScored){//are we done counting in? start checking rhythm
+   if(!isCountingIn && !playExample && !hasScored && !canCheckPattern){//are we done counting in? start checking rhythm
     //print("passsed threshold");
       var newTimeStamp = Date.now();
       CheckTimestamp(newTimeStamp, noteDis);
     }
 
-  }
-    
-    // text ('Note: ' + noteDis, 20, 50); 
-     //text ('Note: ' + noteDis, 20, 50); 
-    
-  
-  //text ('Center Clip: ' + centerClipThreshold, 20, 20); 
-  //line (0, height/2, width, height/2);
-  
-  
-  //text ('Fundamental Frequency: ' + freq.toFixed(2), 20, 20); 
-  //line (0, height/2, width, height/2);
-  
- //FIND THE PITCH
- 
+    if(!canCheckPattern){
+      CompareNote(noteDis, 0);
+      console.log('comparing notes@',millis());
+    } //this is for checking pure pitches, mainly for tutorial purposes
+      
 
-  
-   
+  }
+    //DisplayFFT();
     
-    
-  //}
-  /*
-  if(hasScored){
+}
+
+  function DisplayFFT(){
+      //  FFT CODE
+    beginShape();
+    for (var i = 0; i < corrBuff.length; i++) {
+      var w = map(i, 0, corrBuff.length, 0, width);
+      var h = map(corrBuff[i], -1, 1, height, 0);
+      curveVertex(w, h);
+    }
+    endShape();
+
     fill(0);
-    if(rhythmicScore != null){
-      text('Rhythm Score: ' + rhythmicScore, 40, 70 ); //currently wont print if score = 0
+    text ('Center Clip: ' + centerClipThreshold, 20, 20); 
+    line (0, height/2, width, height/2);
+
+    text ('Note: ' + noteDis, 20, 50); 
+    text ('Note: ' + noteDis, 20, 50); 
+
+    text ('Fundamental Frequency: ' + freq.toFixed(2), 20, 20); 
+    line (0, height/2, width, height/2);
+      
+    text ('Center Clip: ' + centerClipThreshold, 20, 20); 
+    line (0, height/2, width, height/2);
+    
+    text ('Fundamental Frequency: ' + freq.toFixed(2), 20, 20); 
+    line (0, height/2, width, height/2);
     }
-    else{
-     text('Rhythm Score: ' + 0, 40, 70 );
+
+    if(hasScored){
+      fill(0);
+      if(rhythmicScore != null){
+        text('Rhythm Score: ' + rhythmicScore, 40, 70 ); //currently wont print if score = 0
+      }
+      else{
+       text('Rhythm Score: ' + 0, 40, 70 );
+      }
     }
-  }/*
+
     if(hasPitchScored){
       fill(0);
       if(pitchBasedScore!= null){
@@ -259,18 +277,7 @@ function draw() {
         text('Pitch Score: ' + 0, 40, 90);
         text('Missed Pitches: ' + missedPitch, 40, 110);
       }
-      */
-    
-}
-
-
-
-
-
-
-
-
-
+  }
 
 // accepts a timeDomainBuffer and multiplies every value
 function autoCorrelate(timeDomainBuffer) {
@@ -427,6 +434,7 @@ function between(x, min, max){
 *to guage the player's rythm
 */
 function counting(){
+  
   var osc = audioContext.createOscillator();
   osc.connect( audioContext.destination );
   osc.frequency.value = 1000;
@@ -434,10 +442,13 @@ function counting(){
   //of operations inside of the StartMetronome() function. 
   if(countingint == 5){
     //print (countingint);
-    StartMetronome();
+    if(canCount)
+      StartMetronome();
+    
     clearInterval(countInMetro);
-  }else if (countingint == 4){
-    print ("Count in: " + countingint);
+
+  }else if (countingint == 4 && !mute){
+      
     osc.start(audioContext.currentTime);
     osc.stop(audioContext.currentTime + 0.25); 
     startTime = Date.now();
@@ -446,14 +457,24 @@ function counting(){
     var passiveMetroTempo = (60/bpm)*1000;
     setPassiveMetronome = setInterval(function() { PassiveMetronome(); }, passiveMetroTempo);
     countingint++;
+
   }else{
-    print ("Count in: " + countingint);
-    osc.start(audioContext.currentTime);
-    osc.stop(audioContext.currentTime + 0.25); 
+
+    if(countingint % 2 == 0){
+      setDownBeat();
+    }else{
+      setBeat();
+    }
+
+    if(!mute){
+      osc.start(audioContext.currentTime);
+      osc.stop(audioContext.currentTime + 0.25); 
+    }
     countingint++;
   }
 
 }
+
 /*
 *Start Metronome keeps track of the rhythmic pattern in the music, 
 *this is how the program knows when to stop accepting input and
@@ -466,16 +487,18 @@ function StartMetronome(){
   var deltaTime = ((60/bpm)/subdivisions[thisDiv][divcounter])*1000 - 50;//50 second offset to account for latency that occurs with the oscillators and these calculations
   var osc = audioContext.createOscillator();
   osc.connect( audioContext.destination );
+
   //print(Date.now());
   //print(divcounter);
   //print(deltaTime);
+
   //ONLY PLAY OSCILLATORS TO DEMONSTRATE RHYTHM AND AVAILABLE PITCHES
   /**
   *In order to play the accepted notes randomly, we return a random integer
   *based on the length of the accepted notes array. We use that index to obtain
-  *the notes string from the accepted notes arrayand then use that key to retrieve the "play frequeny" from the ass. array "playFrequencies"
+  *the notes string from the accepted notes arrayand then use that key to retrieve the "play frequency" from the ass. array "playFrequencies"
   */
-  if(playExample){
+if(playExample){
     var randomNote = Math.floor(Math.random()*((acceptedPitches.length - 1) + 1)) + 0;
     var playNote = playFrequencies[acceptedPitches[randomNote]];
     print(playNote);
@@ -491,20 +514,22 @@ function StartMetronome(){
       print("sixteenth");
       osc.frequency.value = playNote;
     }
-    osc.start(audioContext.currentTime);
-    osc.stop(audioContext.currentTime + 0.25); 
+
+    if(!mute){
+      osc.start(audioContext.currentTime);
+      osc.stop(audioContext.currentTime + 0.25); 
+    }
   }      
 
 
-if (divcounter < subdivisions[thisDiv].length - 1){
-  divcounter++;
-  setTimeout(function(){StartMetronome();}, deltaTime);
-  if(!playExample){
-    //setTimeout(function(){PRScores();}, 50);
+  if (divcounter < subdivisions[thisDiv].length - 1 && !canCount){
+    divcounter++;
+    setTimeout(function(){StartMetronome();}, deltaTime);
+    if(!playExample){
+      //setTimeout(function(){PRScores();}, 50);
   }
 
-}
-else{
+  }else{
   //gives the length of a quarter note before calculating the score, this is helpful if the player
   //doesnt't play on the last beat
   if(playExample){
@@ -514,9 +539,10 @@ else{
       divcounter = 0;
       clearInterval(setPassiveMetronome);
       var countInTempo = (60/bpm)*1000;
-      countInMetro = setInterval(function() { counting(); }, countInTempo);
+      if(canCount)
+        countInMetro = setInterval(function() { counting(); }, countInTempo);
     }
-    else{
+    else if(!tutorial){
       playCount++;
       setTimeout(function(){PRScores();}, 300);
       setTimeout(function(){NewSession();}, 350);
@@ -534,16 +560,16 @@ else{
 *on a missed rhythm
 */
 function CompareNote(givenPitch, hasMissed){
-  print(givenPitch);
     //print("calledPitchLOop");
-  if(hasMissed == rHasMissed){
+  if(hasMissed == rHasMissed && !tutorial){
+    print('never go in tutorial');
     return;
   }
   for(var i = 0; i < hitPitches.length; i ++){
     if(TrackHitPitches(givenPitch) && hitPitches[i] != "hit"){
       hitPitches[i] = "hit";
-      //DO CORRECT NOTE THINGS HERE
-      correctNote();
+      // -=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- CALLS TO SKETCH_VISUALS SHOULD ONLY HAPPEN HERE
+      handleCorrectNote(givenPitch);
       //pitchHit[i]
       return;
       //break;
@@ -556,7 +582,7 @@ function CompareNote(givenPitch, hasMissed){
 
   }
   //NOTHING HAPPENS
-  print("Pitch missed");
+  print("Pitch missed -", givenPitch);
 
   //TODO we need a way to bypass rhythm tracking for debug purposes
 }
@@ -589,9 +615,8 @@ function CheckTimestamp(givenTime, givenPitch){
       hitArrray[i] = "hit";
       //print(givenTime);
       //print(timeStampArray[i]);
-      //WHEN USING THIS DATA FOR VISUALS HIT WOULD BE RETURNED INSTEAD OF PRINTED TO THE CONSOLE
-      print(i);
-      print("Rhythm hit!");
+      //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-WHEN USING THIS DATA FOR VISUALS HIT WOULD BE RETURNED INSTEAD OF PRINTED TO THE CONSOLE
+      print("Rhythm hit at ",i);
       CompareNote(givenPitch, i);
       break;
     
@@ -605,15 +630,13 @@ function CheckTimestamp(givenTime, givenPitch){
           break;
         }
         else if(i == timeStampArray.length - 1){
-          print("Rhythm missed!");
-          print(i);
+          print("Rhythm missed! ", i);
           CompareNote(givenPitch, i);
           rHasMissed = i; //accounts for duplicates
           break;
         }
         else{
-          print(i);
-          print("Rhythm missed!");
+          print("Rhythm missed!",i);
           CompareNote(givenPitch, i);
           rHasMissed = i;  //accounts for duplicates
         }
@@ -666,7 +689,7 @@ function RhythmScore(){
   rhythmicScore = score/hitArrray.length * 100;
   
   totalRhythmScore += rhythmicScore;
-  print(rhythmicScore);
+  // print(rhythmicScore);
 
 }
 
@@ -716,7 +739,8 @@ function ScanPerfect(){
   return perfectCount;
 }
 function PassiveMetronome(){
-  //CUE METRO VISUALS HERE
+  //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-CUE METRO VISUALS HERE
+  setDownBeat();
   print("Metronome downbeat");
 
 }
@@ -752,7 +776,8 @@ function NewSession(){
     isCountingIn = true;
     divcounter = 0;
     var countInTempo = (60/bpm)*1000;
-    countInMetro = setInterval(function() { counting(); }, countInTempo);
+    if(canCount)
+      countInMetro = setInterval(function() { counting(); }, countInTempo);
   }
 
 }
@@ -781,7 +806,8 @@ function Restart(){
   isCountingIn = true;
   divcounter = 0;
   var countInTempo = (60/bpm)*1000;
-  countInMetro = setInterval(function() { counting(); }, countInTempo);
+  if(canCount)
+    countInMetro = setInterval(function() { counting(); }, countInTempo);
 }
 
 
