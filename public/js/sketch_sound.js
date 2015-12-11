@@ -138,7 +138,7 @@ var tutorial = true;
 var canCount = true;
 var canCheckPattern = true;
 
-var mute = true;
+var mute = false;
 
 
 function setup() {
