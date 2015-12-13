@@ -62,6 +62,13 @@ var pitchHit = null;//KEEPS TRACK WHICH PITCHES HAVE BEEN HIT IN A PHRASE
 var rHasMissed = null;
 var rMissedArray;
 
+var hiHatAnalog; 
+var hihatDigital;
+var kickAcoustic;
+var snare;
+
+var samples = [];
+
 
 //test pitch
 
@@ -144,13 +151,22 @@ function setup() {
   pickDiv = Math.floor(Math.random()*((numSubdivisions) - 0)) + 1;
   thisDiv = 'subdivisions' + pickDiv;
   print(thisDiv);
-  print(subdivisions[thisDiv]);
-  print(subdivisions[thisDiv][1]);
+  //print(subdivisions[thisDiv]);
+  //print(subdivisions[thisDiv][1]);
   timeStampArray = new Array(subdivisions[thisDiv].length);
   hitArrray = new Array(timeStampArray.length);
   hitPitches = new Array(timeStampArray.length);
   rMissedArray = new Array(timeStampArray.length);
   pitchHit = new Array(acceptedPitches.length);
+
+
+  hiHatAnalog= loadSound('hihat-analog.wav');
+  hihatDigital = loadSound('hihat-digital.wav');
+  kickAcoustic = loadSound('kick-acoustic01.wav');
+  snare = loadSound('snare-808.wav');
+  samples = [snare, kickAcoustic, hiHatAnalog];
+
+
 
   print('date: '+Date.now());
 
@@ -438,8 +454,9 @@ function counting(){
     clearInterval(countInMetro);
   }else if (countingint == 4){
     print ("Count in: " + countingint);
-    osc.start(audioContext.currentTime);
-    osc.stop(audioContext.currentTime + 0.25); 
+    hihatDigital.play();
+    //osc.start(audioContext.currentTime);
+    //osc.stop(audioContext.currentTime + 0.25); 
     startTime = Date.now();
     PopulateTimestamps();
     isCountingIn = false;
@@ -448,8 +465,9 @@ function counting(){
     countingint++;
   }else{
     print ("Count in: " + countingint);
-    osc.start(audioContext.currentTime);
-    osc.stop(audioContext.currentTime + 0.25); 
+    hihatDigital.play();
+    //osc.start(audioContext.currentTime);
+    //osc.stop(audioContext.currentTime + 0.25); 
     countingint++;
   }
 
@@ -476,23 +494,13 @@ function StartMetronome(){
   *the notes string from the accepted notes arrayand then use that key to retrieve the "play frequeny" from the ass. array "playFrequencies"
   */
   if(playExample){
-    var randomNote = Math.floor(Math.random()*((acceptedPitches.length - 1) + 1)) + 0;
-    var playNote = playFrequencies[acceptedPitches[randomNote]];
-    print(playNote);
-    if(subdivisions[thisDiv][divcounter] == 1){
-      print("quarter");
-      osc.frequency.value = playNote;
-    }
-    if(subdivisions[thisDiv][divcounter] == 2){
-      print("eigth");
-      osc.frequency.value = playNote;
-    }
-    if(subdivisions[thisDiv][divcounter] == 4){
-      print("sixteenth");
-      osc.frequency.value = playNote;
-    }
-    osc.start(audioContext.currentTime);
-    osc.stop(audioContext.currentTime + 0.25); 
+    var randomSample = Math.floor(Math.random()*((samples.length - 1) + 1)) + 0;
+    var playSample = samples[randomSample];
+    print(samples[randomSample]);
+    print(playSample);
+    playSample.play();
+    //osc.start(audioContext.currentTime);
+    //osc.stop(audioContext.currentTime + 0.25); 
   }      
 
 
