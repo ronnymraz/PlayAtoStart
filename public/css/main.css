@@ -2,8 +2,42 @@ body{
 	margin-right: 25%;
 	margin-left: 25%;
 	text-align: center;
+	background-color: rgb(255, 255, 253);
+	font-family: Trebuchet MS;
 }
 
 #title{
-	margin: 10%;
+	margin-top: 10%;
+	font-size: 3.3em;
+}
+
+#subtitle{
+	margin-top: 2%;
+	margin-bottom: 10%;
+	font-size: 1.25em;
+	font-style: italic;
+}
+
+#levelsContainer{
+	background-color: rgb(200, 243, 234);
+}
+
+.about{
+	text-align: right;
+	float: right;
+}
+
+.howto{
+	text-align: left;
+	float: left;
+}
+
+a{
+	color: black;
+
+	margin-top: 5px;
+}
+
+canvas{
+	z-index: -1;
 }
