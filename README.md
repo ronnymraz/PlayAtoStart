@@ -1,2 +1,3 @@
 Play ‘A’ to Start is a music game that adds audio/visual interactivity to the music practice process. In each level, players are given a series of rhythmic passages to mimic by playing a set of pitches that are provided to them with their instrument. Playing correctly adds color to the world, allowing the player to visually witness the progression of their musical ability. As players advance in level, the passages and accepted notes increase in difficulty eventually allowing the player to improvise rhythms using pitch-sets such as the pentatonic scale.
+
 Development Team: Angela Lau, Batu Aytemiz, Ronny Mraz, Pierre Depaz
