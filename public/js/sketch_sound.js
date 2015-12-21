@@ -7,24 +7,22 @@
  *
  *  Running the signal through a low pass filter prior to
  *  autocorrelation helps bring out the fundamental frequency.
- *  
- *  The visualization is a correlogram, which plots
- *  the autocorrelations.
  *
  *  We calculate the pitch by counting the number of samples
  *  between peaks.
  *  
- *  Example by Jason Sigal and Golan Levin.
+ *  AutoCorrelation Example by Jason Sigal and Golan Levin.
  *
- *  Edited to inclde an amplitude threshold and pitch recognition by: Ronny Mraz
- * 
+ *  Edited to inclde an amplitude threshold and monophonic pitch recognition by Ronny Mraz
+ *
+ *  Live Rhythm Tracking and Gameplay functionality by Ronny Mraz
  */
 
 /*
 delta bpm formula:
 deltaTime = ((bpm/60)/subdivision) * 1000
 
-MAKE SURE CONSOLE VIEW IS ON FOR RHTYHMIC FEEDBACK
+TURN ON CONSOLE VIEW FOR RHTYHMIC FEEDBACK
 
 */
 
@@ -42,6 +40,7 @@ var fundFreqs = [16.35, 17.32, 18.35, 19.45, 20.60, 21.83, 23.12, 24.50, 25.96, 
 //array of corresponding notes
 var pitches =   ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]; 
 
+//no longer necessary with sample based playback
 var playFrequencies = {"C":261.63, "C#":277.18, "D":293.66, "D#":311.13,"E": 29.63,"F": 349.23, 
 "F#":369.99, "G":392, "G#":415.3, "A":440, "A#":466.16, "B":493.88};
 
@@ -59,7 +58,7 @@ var playExample = true;
 var wrongPitches = [];
 var pitchHit = null;//KEEPS TRACK WHICH PITCHES HAVE BEEN HIT IN A PHRASE
 
-var rHasMissed = null;
+var rHasMissed = null; //have we missed in this window already
 var rMissedArray;
 
 var hiHatAnalog; 
@@ -69,8 +68,9 @@ var snare;
 
 var samples = [];
 
-
-//test pitch
+//difference in frequencies (Hz) of absolute fundamentals 
+//can be used to create a more robust pitch detector
+//var compFloats = [.485, .515, 1.15, 1.23, 1.29, 1.38, 1.43, 1.54, 1.64,]
 
 //our note
 var noteDis = "empty";
@@ -79,6 +79,9 @@ var audioContext = null;//used for oscillators
 
 var startTime = null;//used to calibrate timestamp array
 var runningAccepted = null;//used as a running timestamp to be reinserted in the timestamp array
+
+var runningPitchScore = 0;//players pitch score over an entire level
+var totalPitchScore = 0;//score to use as denominator to calculate overall pitch score
 
 var hasPitchScored = false;
 var pitchBasedScore = null;
@@ -98,7 +101,7 @@ where as: [2,1] would produce an eigth and a quarter (ending on an upbeat), we d
 //EDIT BPM
 var bpm = 60;
 //EDIT SUBDIVISIONS
-// 1 = quarter, 2 = eigth, 4 = sixteenth
+// 1 = quarter, 2 = eigth, 3 = triplet 4 = sixteenth
 /* The subdivisions object will contain arrays of all the 
 *various subdivisions, the current being for level 0.
 *To transfer this to level one just change these variables accordingly.
@@ -110,14 +113,14 @@ subdivisions.subdivisions2 = [2, 2, 1, 2, 2, 1];
 subdivisions.subdivisions3 = [1, 2, 2, 1, 1];
 var numSubdivisions = 3;
 //EDIT ACCEPTED PITCHEST
-var acceptedPitches = ["D", "F"];
+var acceptedPitches = ["D", "F"]; //accepted pitches for level
 var pickDiv;
 var thisDiv;
 /*
 *
 */
 
-var metronomeTime = 1000;//i dont think this actually does anything
+//var metronomeTime = 1000;//i dont think this actually does anything
 
 var timeStampArray = null;//will be populated with timestamps
 var hitArrray = null;//timestamps that result in a rhythmic "hit"
@@ -148,11 +151,11 @@ function setup() {
   noFill();
 
   audioContext = new AudioContext();
+  //choose our initial subdivision
   pickDiv = Math.floor(Math.random()*((numSubdivisions) - 0)) + 1;
   thisDiv = 'subdivisions' + pickDiv;
   print(thisDiv);
-  //print(subdivisions[thisDiv]);
-  //print(subdivisions[thisDiv][1]);
+  //create our array of accepted timestamps as they correspond to this subdivision
   timeStampArray = new Array(subdivisions[thisDiv].length);
   hitArrray = new Array(timeStampArray.length);
   hitPitches = new Array(timeStampArray.length);
@@ -161,7 +164,7 @@ function setup() {
 
 
   hiHatAnalog= loadSound('hihat-analog.wav');
-  hihatDigital = loadSound('hihat-digital.wav');
+  hihatDigital = loadSound('hihat-digital.wav');//used for metronome, not included in sample array
   kickAcoustic = loadSound('kick-acoustic01.wav');
   snare = loadSound('snare-808.wav');
   samples = [snare, kickAcoustic, hiHatAnalog];
@@ -185,9 +188,10 @@ function setup() {
   //count in a series of quarter notes to be printed to the console
   
   var countInTempo = (60/bpm)*1000;
+  /*
+  *BEGIN GAMEPLAY ********************
+  */
   countInMetro = setInterval(function() { counting(); }, countInTempo);
-  //StartMetronome();
-
   timerListenNote = 50;
 }
 
@@ -202,91 +206,22 @@ function draw() {
 
   //only run calculations if the source amplitude is above the threshold
 
-
   if(volume > threshold + cutoff){
-
-
-    //FFT CODE
-    // beginShape();
-    // for (var i = 0; i < corrBuff.length; i++) {
-    //   var w = map(i, 0, corrBuff.length, 0, width);
-    //   var h = map(corrBuff[i], -1, 1, height, 0);
-    //   curveVertex(w, h);
-    // }
-    // endShape();
-
-    // fill(0);
-    // text ('Center Clip: ' + centerClipThreshold, 20, 20); 
-    // line (0, height/2, width, height/2);
-    
     freq = findFrequency(corrBuff);
-    // text ('Fundamental Frequency: ' + freq.toFixed(2), 20, 20); 
-    // line (0, height/2, width, height/2);
-    
-   //FIND THE PITCH
-
-   //todo: average out / broader range of acceptable notes to account for imperfection/stutter?
-   //SEE COMPARE NOTES FUNCTION
-   noteDis = getNote(freq);
-   if(!isCountingIn && !playExample && !hasScored){//are we done counting in? start checking rhythm
-    //print("passsed threshold");
-      var newTimeStamp = Date.now();
-      CheckTimestamp(newTimeStamp, noteDis);
-    }
-
-  }
-    
-    // text ('Note: ' + noteDis, 20, 50); 
-     //text ('Note: ' + noteDis, 20, 50); 
-    
-  
-  //text ('Center Clip: ' + centerClipThreshold, 20, 20); 
-  //line (0, height/2, width, height/2);
-  
-  
-  //text ('Fundamental Frequency: ' + freq.toFixed(2), 20, 20); 
-  //line (0, height/2, width, height/2);
-  
- //FIND THE PITCH
- 
-
-  
-   
-    
-    
-  //}
-  /*
-  if(hasScored){
-    fill(0);
-    if(rhythmicScore != null){
-      text('Rhythm Score: ' + rhythmicScore, 40, 70 ); //currently wont print if score = 0
-    }
-    else{
-     text('Rhythm Score: ' + 0, 40, 70 );
-    }
-  }/*
-    if(hasPitchScored){
-      fill(0);
-      if(pitchBasedScore!= null){
-        text('Pitch Score: ' + pitchBasedScore, 40, 90);
-        text('Missed Pitches: ' + missedPitch, 40, 110);
+     noteDis = getNote(freq);
+     if(!isCountingIn && !playExample && !hasScored){//are we done counting in? start checking rhythm
+      //print("passsed threshold");
+        var newTimeStamp = Date.now();
+        CheckTimestamp(newTimeStamp, noteDis);
       }
-      else{
-        text('Pitch Score: ' + 0, 40, 90);
-        text('Missed Pitches: ' + missedPitch, 40, 110);
-      }
-      */
+
+  }    
     
 }
 
-
-
-
-
-
-
-
-
+/*
+*AUTOCORRELATION CODE
+*/
 
 // accepts a timeDomainBuffer and multiplies every value
 function autoCorrelate(timeDomainBuffer) {
@@ -395,6 +330,12 @@ function findFrequency(autocorr) {
   var fundamentalFrequency = sampleRate() / distanceToNextLargestPeak;
   return fundamentalFrequency;
 }
+
+/*
+*END AUTOCORRELATE CODE
+*/
+
+
 //Get the pitch of the note by dividing the fundamental frequency
 //of the signal by 2 until it is in the range of the absolute fundmantals
 //compare this against an array of accepted frequencies, accounting for
@@ -404,8 +345,9 @@ function getNote(frequency){
 	//print(frequency);
 	
 	//comparision float difference to account for quartertones and artifacts
-	var compfloat = .435;
+	var compfloat = .465;
 	
+
 	//brings value to an absolute fundamental
 	while(frequency > 31.735){
 		frequency = frequency/2;
@@ -443,9 +385,6 @@ function between(x, min, max){
 *to guage the player's rythm
 */
 function counting(){
-  var osc = audioContext.createOscillator();
-  osc.connect( audioContext.destination );
-  osc.frequency.value = 1000;
   //The metronome is started on the first downbeat because of the order
   //of operations inside of the StartMetronome() function. 
   if(countingint == 5){
@@ -455,19 +394,15 @@ function counting(){
   }else if (countingint == 4){
     print ("Count in: " + countingint);
     hihatDigital.play();
-    //osc.start(audioContext.currentTime);
-    //osc.stop(audioContext.currentTime + 0.25); 
     startTime = Date.now();
     PopulateTimestamps();
     isCountingIn = false;
     var passiveMetroTempo = (60/bpm)*1000;
-    setPassiveMetronome = setInterval(function() { PassiveMetronome(); }, passiveMetroTempo);
+    setPassiveMetronome = setInterval(function() { PassiveMetronome(); }, passiveMetroTempo); //basic downbeat metronome
     countingint++;
   }else{
     print ("Count in: " + countingint);
     hihatDigital.play();
-    //osc.start(audioContext.currentTime);
-    //osc.stop(audioContext.currentTime + 0.25); 
     countingint++;
   }
 
@@ -475,19 +410,11 @@ function counting(){
 /*
 *Start Metronome keeps track of the rhythmic pattern in the music, 
 *this is how the program knows when to stop accepting input and
-*score the player. Oscillators are present purely for reference
-*and testing the subdivision array. Oscillators should be commented out 
-during a live session and to preserve resources.
+*score the player. 
 */
 function StartMetronome(){
   //calculates the time of the current subdivision
-  var deltaTime = ((60/bpm)/subdivisions[thisDiv][divcounter])*1000 - 50;//50 second offset to account for latency that occurs with the oscillators and these calculations
-  var osc = audioContext.createOscillator();
-  osc.connect( audioContext.destination );
-  //print(Date.now());
-  //print(divcounter);
-  //print(deltaTime);
-  //ONLY PLAY OSCILLATORS TO DEMONSTRATE RHYTHM AND AVAILABLE PITCHES
+  var deltaTime = ((60/bpm)/subdivisions[thisDiv][divcounter])*1000 - 50;//50 second offset to account for latency that occurs with sample playback
   /**
   *In order to play the accepted notes randomly, we return a random integer
   *based on the length of the accepted notes array. We use that index to obtain
@@ -496,11 +423,7 @@ function StartMetronome(){
   if(playExample){
     var randomSample = Math.floor(Math.random()*((samples.length - 1) + 1)) + 0;
     var playSample = samples[randomSample];
-    print(samples[randomSample]);
-    print(playSample);
     playSample.play();
-    //osc.start(audioContext.currentTime);
-    //osc.stop(audioContext.currentTime + 0.25); 
   }      
 
 
@@ -513,7 +436,7 @@ if (divcounter < subdivisions[thisDiv].length - 1){
 
 }
 else{
-  //gives the length of a quarter note before calculating the score, this is helpful if the player
+  //delays calculations by the length of a quarter note before calculating the score, this is helpful if the player
   //doesnt't play on the last beat
   if(playExample){
       playExample = false;
@@ -526,8 +449,8 @@ else{
     }
     else{
       playCount++;
-      setTimeout(function(){PRScores();}, 300);
-      setTimeout(function(){NewSession();}, 350);
+      setTimeout(function(){PRScores();}, 400);
+      setTimeout(function(){NewSession();}, 450);
     }
   
 
@@ -543,29 +466,24 @@ else{
 */
 function CompareNote(givenPitch, hasMissed){
   print(givenPitch);
-    //print("calledPitchLOop");
   if(hasMissed == rHasMissed){
     return;
   }
   for(var i = 0; i < hitPitches.length; i ++){
     if(TrackHitPitches(givenPitch) && hitPitches[i] != "hit"){
       hitPitches[i] = "hit";
-      //DO CORRECT NOTE THINGS HERE
+      //INITIALIZE POSSITIVE VISUALS
       correctNote();
-      //pitchHit[i]
       return;
-      //break;
     }
     else if(TrackHitPitches() && hitPitches[i] == "hit"){
       //ALSO HERE
       return;
-      //break;
     }
 
   }
   //NOTHING HAPPENS
   print("Pitch missed");
-
   //TODO we need a way to bypass rhythm tracking for debug purposes
 }
 
@@ -590,14 +508,14 @@ function TrackHitPitches(givenPitch){
 function CheckTimestamp(givenTime, givenPitch){
   //print("CheckTimestamp");
   for(var i = 0; i < timeStampArray.length; i++){
-    var mintime = timeStampArray[i]-70;
-    var maxtime = timeStampArray[i]+70;
+    var mintime = timeStampArray[i]-100;
+    var maxtime = timeStampArray[i]+100;
     if (between(givenTime, mintime, maxtime) && hasHit != i){
       hasHit = i; //this timestamp is marked as a hit
       hitArrray[i] = "hit";
       //print(givenTime);
       //print(timeStampArray[i]);
-      //WHEN USING THIS DATA FOR VISUALS HIT WOULD BE RETURNED INSTEAD OF PRINTED TO THE CONSOLE
+      //WHEN USING THIS DATA FOR VISUALS, HIT WOULD BE RETURNED INSTEAD OF PRINTED TO THE CONSOLE
       print(i);
       print("Rhythm hit!");
       CompareNote(givenPitch, i);
@@ -651,8 +569,6 @@ function PopulateTimestamps(){
     }
     runningAccepted += deltaTime;
     timeStampArray[i] = runningAccepted;
-   //print(i);
-   //print(timeStampArray[i]);
 
   }
 
@@ -667,8 +583,6 @@ function RhythmScore(){
   for(var i = 0; i < hitArrray.length; i++){
     if(hitArrray[i] == "hit"){
       score++;
-      //hasScored = true;
-    //print(score);
     }
   }
   rhythmicScore = score/hitArrray.length * 100;
@@ -685,8 +599,6 @@ function PitchScore(){
   for(var i = 0; i < hitPitches.length; i++){
     if(hitPitches[i] == "hit"){
       pScore++;
-      //hasPitchScored = true;
-    //print(score);
     } 
   }
   for(var i = 0; i < pitchHit.length; i++){
@@ -696,24 +608,27 @@ function PitchScore(){
     }
   }
   pitchBasedScore = pScore/hitPitches.length * 100;
+  totalPitchScore += pitchBasedScore;
   print(pitchBasedScore);
   print("Missed Pitches: " + missedPitch);
 }
-
+//Overall scores throughout the level
 function RunningScore(){
   runningRhythmScore = totalRhythmScore/playCount;
+  runningPitchScore = totalPitchScore/playCount;
 }
-
+//clear the downbeat metronome, calculate individual scores, check for a perfect round
 function PRScores(){
   clearInterval(setPassiveMetronome);
   RhythmScore();
   PitchScore();
+  //Was this a perfect round?
   if(rhythmicScore == 100 && pitchBasedScore == 100){
     perfectArray[playCount] = "perfect";
   }
 
 }
-
+//In the level, how many perfect rounds were there
 function ScanPerfect(){
   var perfectCount = 0;
   for(var i = 0; i<perfectArray.length; i++){
@@ -724,33 +639,36 @@ function ScanPerfect(){
   return perfectCount;
 }
 function PassiveMetronome(){
-  //CUE METRO VISUALS HERE
+  //CUE DOWNBEAT METRO VISUALS HERE
   print("Metronome downbeat");
 
 }
+//If the player has played through 4 rounds and has rhythm and pitch scores above 55, they win
+//if the score is not above 55 after 4 rounds, the player continues for 2 more rounds
+//if the player fails to reach this score after 6 rounds in total, they fail the level
 function NewSession(){
   RunningScore();
-  print("Running Score = " + runningRhythmScore);
-  if(playCount == 4 && runningRhythmScore >= 75 && pitchBasedScore >= 75){
+  print("Running Rhythm Score = " + runningRhythmScore);
+  print("Running Pitch Score = " + runningPitchScore);
+  if(playCount == 4 && runningRhythmScore >= 55 && runningPitchScore >= 55){
+    print("Complete!")
+    var perectRhythms = ScanPerfect();
+    print("You Had " + perectRhythms + " perfect rounds!");
+    print("RhythmScore = " + runningRhythmScore + "PitchScore = " + runningPitchScore );
+  }
+  else if(playCount == 6 && runningRhythmScore >= 55 && runningPitchScore >= 55){
     print("Complete!")
     var perectRhythms = ScanPerfect();
     print("You Had " + perectRhythms + " perfect rounds!");
   }
-  else if(playCount == 6 && runningRhythmScore >= 75 && pitchBasedScore >= 100){
-    print("Complete!")
-    var perectRhythms = ScanPerfect();
-    print("You Had " + perectRhythms + " perfect rounds!");
-  }
-  else if(playCount >= 6 && (runningRhythmScore <= 75 || pitchBasedScore != 100)){
-    print("Level Failed! RhythmScore = " + runningRhythmScore + "PitchScore = " + pitchBasedScore );
+  else if(playCount >= 6 && (runningRhythmScore <= 55 || runningPitchScore != 55)){
+    print("Level Failed! RhythmScore = " + runningRhythmScore + "PitchScore = " + runningPitchScore);
 
   }
+  //reset variables for a new round
   else{
     pickDiv = Math.floor(Math.random()*((numSubdivisions) - 0)) + 1;
     thisDiv = 'subdivisions' + pickDiv;
-    // print(thisDiv);
-    // print(subdivisions[thisDiv]);
-    // print(subdivisions[thisDiv][1]);
     timeStampArray = new Array(subdivisions[thisDiv].length);
     hitArrray = new Array(timeStampArray.length);
     hitPitches = new Array(timeStampArray.length);
@@ -766,7 +684,7 @@ function NewSession(){
 }
 /*
 *
-*NOT CALLED YET, this is showing all the audio variables that will be reset when we call a restart
+*NOT CALLED YET, this is all the audio variables that will be reset when we call a restart on the level
 */
 
 function Restart(){
@@ -777,9 +695,6 @@ function Restart(){
   pitchBasedScore = 0;
   pickDiv = Math.floor(Math.random()*((numSubdivisions) - 0)) + 1;
   thisDiv = 'subdivisions' + pickDiv;
-  // print(thisDiv);
-  // print(subdivisions[thisDiv]);
-  // print(subdivisions[thisDiv][1]);
   timeStampArray = new Array(subdivisions[thisDiv].length);
   hitArrray = new Array(timeStampArray.length);
   hitPitches = new Array(timeStampArray.length);
