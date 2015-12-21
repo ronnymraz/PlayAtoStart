@@ -13,7 +13,7 @@
  *  
  *  AutoCorrelation Example by Jason Sigal and Golan Levin.
  *
- *  Edited to inclde an amplitude threshold and monophonic pitch recognition by Ronny Mraz
+ *  Edited to include an amplitude threshold and monophonic pitch recognition by Ronny Mraz
  *
  *  Live Rhythm Tracking and Gameplay functionality by Ronny Mraz
  */
