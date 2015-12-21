@@ -94,9 +94,7 @@ var countingint = 1;//our countin starts at one
 /*
 *The BPM and subdivision system is completely dynamic between
 *the bpm, and subdivisions up to a sixteenth. Just make sure they make sense
-* For example: [2, 2, 1] would produce 2 eigthnotes and a quarter, ending on proper downbeats
-where as: [2,1] would produce an eigth and a quarter (ending on an upbeat), we dont want that type of uneven rhythm yet
-(though it would still work, its not optimal for testing)
+* For example: [2, 2, 1] would produce 2 eigthnotes and a quarter, ending on a downbeat
 */
 //EDIT BPM
 var bpm = 60;
