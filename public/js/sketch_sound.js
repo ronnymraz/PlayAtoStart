@@ -147,8 +147,11 @@ var freq;
 var startTimeListenNote;
 var timerListenNote = 50;
 
+//are we at a warmup scene?
 var warmupScene = true;
+//track the users warmup project
 var trackWarmUp = [];
+//number of correct "hits" the user needs 100 felt nice
 var warmupNum = 100;
 
 
@@ -180,6 +183,7 @@ function setup() {
   //count in a series of quarter notes to be printed to the console
   if(warmupScene){
     trackWarmUp = new Array(acceptedPitches.length);
+    //calibrate our hit array for the warmup, each array slot will count towards the warmup number for the number of pitches in the level
     for(var i = 0; i < trackWarmUp.length; i++){
       trackWarmUp[i] = 0;
       console.log(trackWarmUp[i]);
@@ -525,7 +529,11 @@ function TrackHitPitches(givenPitch){
   }
   return false;
 }
-
+/*
+* Iterate through our array of accepted pitches to check for matches. 
+* each time we hit the pitch, increase the counter in the corresping (1:1)
+* trackWarmUp array, check this array after every registered pitch
+*/
 function WarmUpCorrectNotes(givenPitch){
   for(var i = 0; i < acceptedPitches.length; i++){
     if(givenPitch == acceptedPitches[i]){
@@ -537,6 +545,11 @@ function WarmUpCorrectNotes(givenPitch){
   CheckWarmup();
 
 }
+/*
+*Checks if each array index has has reached the warmup number,
+*until we reach the last index in the array.If any index has not reached
+*the value stored in warmUpNum, we break out of the for loop
+*/
 function CheckWarmup(){
   console.log("Checking warmup!");
   for(var j = 0; j < trackWarmUp.length; j++){
@@ -545,7 +558,7 @@ function CheckWarmup(){
       if(j == trackWarmUp.length - 1){
         console.log("Warmup Complete!");
         warmupScene = false;
-        Restart();
+        Restart(); //sets parameters for gameplay
       }else{
         continue;
       }
