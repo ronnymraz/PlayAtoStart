@@ -13,7 +13,7 @@
  *  
  *  AutoCorrelation Example by Jason Sigal and Golan Levin.
  *
- *  Edited to include an amplitude threshold and monophonic pitch recognition by Ronny Mraz
+ *  Edited to inclde an amplitude threshold and monophonic pitch recognition by Ronny Mraz
  *
  *  Live Rhythm Tracking and Gameplay functionality by Ronny Mraz
  */
@@ -91,10 +91,14 @@ var hasHit = null;//variable to account for dublicate hits
 
 var countingint = 1;//our countin starts at one
 
+var waitForCountIn = false;
+
 /*
 *The BPM and subdivision system is completely dynamic between
 *the bpm, and subdivisions up to a sixteenth. Just make sure they make sense
-* For example: [2, 2, 1] would produce 2 eigthnotes and a quarter, ending on a downbeat
+* For example: [2, 2, 1] would produce 2 eigthnotes and a quarter, ending on proper downbeats
+where as: [2,1] would produce an eigth and a quarter (ending on an upbeat), we dont want that type of uneven rhythm yet
+(though it would still work, its not optimal for testing)
 */
 //EDIT BPM
 var bpm = 60;
@@ -143,6 +147,11 @@ var freq;
 var startTimeListenNote;
 var timerListenNote = 50;
 
+var warmupScene = true;
+var trackWarmUp = [];
+var warmupNum = 100;
+
+
 
 function setup() {
   noCanvas();
@@ -150,22 +159,7 @@ function setup() {
 
   audioContext = new AudioContext();
   //choose our initial subdivision
-  pickDiv = Math.floor(Math.random()*((numSubdivisions) - 0)) + 1;
-  thisDiv = 'subdivisions' + pickDiv;
-  print(thisDiv);
-  //create our array of accepted timestamps as they correspond to this subdivision
-  timeStampArray = new Array(subdivisions[thisDiv].length);
-  hitArrray = new Array(timeStampArray.length);
-  hitPitches = new Array(timeStampArray.length);
-  rMissedArray = new Array(timeStampArray.length);
-  pitchHit = new Array(acceptedPitches.length);
-
-
-  hiHatAnalog= loadSound('hihat-analog.wav');
-  hihatDigital = loadSound('hihat-digital.wav');//used for metronome, not included in sample array
-  kickAcoustic = loadSound('kick-acoustic01.wav');
-  snare = loadSound('snare-808.wav');
-  samples = [snare, kickAcoustic, hiHatAnalog];
+  
 
 
 
@@ -184,13 +178,39 @@ function setup() {
   fft = new p5.FFT();
   fft.setInput(lowPass);
   //count in a series of quarter notes to be printed to the console
+  if(warmupScene){
+    trackWarmUp = new Array(acceptedPitches.length);
+    for(var i = 0; i < trackWarmUp.length; i++){
+      trackWarmUp[i] = 0;
+      console.log(trackWarmUp[i]);
+    }
+
+  }else{
+    var countInTempo = (60/bpm)*1000;
+    /*
+    *BEGIN GAMEPLAY ********************
+    */
+    pickDiv = Math.floor(Math.random()*((numSubdivisions) - 0)) + 1;
+    thisDiv = 'subdivisions' + pickDiv;
+    print(thisDiv);
+    //create our array of accepted timestamps as they correspond to this subdivision
+    timeStampArray = new Array(subdivisions[thisDiv].length);
+    hitArrray = new Array(timeStampArray.length);
+    hitPitches = new Array(timeStampArray.length);
+    rMissedArray = new Array(timeStampArray.length);
+    pitchHit = new Array(acceptedPitches.length);
+
+
+    hiHatAnalog= loadSound('hihat-analog.wav');
+    hihatDigital = loadSound('hihat-digital.wav');//used for metronome, not included in sample array
+    kickAcoustic = loadSound('kick-acoustic01.wav');
+    snare = loadSound('snare-808.wav');
+    samples = [snare, kickAcoustic, hiHatAnalog];
+    countInMetro = setInterval(function() { counting(); }, countInTempo);
+    timerListenNote = 50;
+    console.log(acceptedPitches.length);
+  }
   
-  var countInTempo = (60/bpm)*1000;
-  /*
-  *BEGIN GAMEPLAY ********************
-  */
-  countInMetro = setInterval(function() { counting(); }, countInTempo);
-  timerListenNote = 50;
 }
 
 function draw() {
@@ -207,10 +227,19 @@ function draw() {
   if(volume > threshold + cutoff){
     freq = findFrequency(corrBuff);
      noteDis = getNote(freq);
-     if(!isCountingIn && !playExample && !hasScored){//are we done counting in? start checking rhythm
+     if(!isCountingIn && !playExample && !hasScored && !warmupScene){//are we done counting in? start checking rhythm
       //print("passsed threshold");
-        var newTimeStamp = Date.now();
-        CheckTimestamp(newTimeStamp, noteDis);
+        if(waitForCountIn){
+          waitForCountIn = false;
+          isCountingIn = true;
+          var countInTempo = (60/bpm)*1000;
+          countInMetro = setInterval(function() { counting(); }, countInTempo);
+        }else{
+          var newTimeStamp = Date.now();
+          CheckTimestamp(newTimeStamp, noteDis);
+        }
+      }else if(warmupScene){
+        WarmUpCorrectNotes(noteDis);
       }
 
   }    
@@ -416,7 +445,7 @@ function StartMetronome(){
   /**
   *In order to play the accepted notes randomly, we return a random integer
   *based on the length of the accepted notes array. We use that index to obtain
-  *the notes string from the accepted notes arrayand then use that key to retrieve the "play frequeny" from the ass. array "playFrequencies"
+  *the notes string from the accepted notes arrayand then use that key to retrieve the "play frequency" from the ass. array "playFrequencies"
   */
   if(playExample){
     var randomSample = Math.floor(Math.random()*((samples.length - 1) + 1)) + 0;
@@ -438,12 +467,13 @@ else{
   //doesnt't play on the last beat
   if(playExample){
       playExample = false;
-      isCountingIn = true;
+      isCountingIn = false;
+      waitForCountIn = true;
       countingint = 1;
       divcounter = 0;
       clearInterval(setPassiveMetronome);
       var countInTempo = (60/bpm)*1000;
-      countInMetro = setInterval(function() { counting(); }, countInTempo);
+      //countInMetro = setInterval(function() { counting(); }, countInTempo);
     }
     else{
       playCount++;
@@ -471,7 +501,7 @@ function CompareNote(givenPitch, hasMissed){
     if(TrackHitPitches(givenPitch) && hitPitches[i] != "hit"){
       hitPitches[i] = "hit";
       //INITIALIZE POSSITIVE VISUALS
-      correctNote();
+      handleCorrectNote(givenPitch);
       return;
     }
     else if(TrackHitPitches() && hitPitches[i] == "hit"){
@@ -496,6 +526,34 @@ function TrackHitPitches(givenPitch){
   return false;
 }
 
+function WarmUpCorrectNotes(givenPitch){
+  for(var i = 0; i < acceptedPitches.length; i++){
+    if(givenPitch == acceptedPitches[i]){
+      trackWarmUp[i] += 1;
+      console.log("Warmup Pitch! " + givenPitch);
+      console.log(trackWarmUp[i]);
+    }
+  }
+  CheckWarmup();
+
+}
+function CheckWarmup(){
+  console.log("Checking warmup!");
+  for(var j = 0; j < trackWarmUp.length; j++){
+    console.log("Warmup number: " + j);
+    if(trackWarmUp[j] > warmupNum){
+      if(j == trackWarmUp.length - 1){
+        console.log("Warmup Complete!");
+        warmupScene = false;
+        Restart();
+      }else{
+        continue;
+      }
+    }else{
+      break;
+    }
+  }
+}
 
 /*
 *When the player's amplitude goes above a threshold, a call is made to Date.Now().
@@ -691,18 +749,27 @@ function Restart(){
   totalRhythmScore = 0;
   runningRhythmScore = 0;
   pitchBasedScore = 0;
+  var countInTempo = (60/bpm)*1000;
+
   pickDiv = Math.floor(Math.random()*((numSubdivisions) - 0)) + 1;
   thisDiv = 'subdivisions' + pickDiv;
+  print(thisDiv);
+  //create our array of accepted timestamps as they correspond to this subdivision
   timeStampArray = new Array(subdivisions[thisDiv].length);
   hitArrray = new Array(timeStampArray.length);
   hitPitches = new Array(timeStampArray.length);
   rMissedArray = new Array(timeStampArray.length);
-  countingint = 1;
-  playExample = true;
-  isCountingIn = true;
-  divcounter = 0;
-  var countInTempo = (60/bpm)*1000;
+  pitchHit = new Array(acceptedPitches.length);
+
+
+  hiHatAnalog= loadSound('hihat-analog.wav');
+  hihatDigital = loadSound('hihat-digital.wav');//used for metronome, not included in sample array
+  kickAcoustic = loadSound('kick-acoustic01.wav');
+  snare = loadSound('snare-808.wav');
+  samples = [snare, kickAcoustic, hiHatAnalog];
   countInMetro = setInterval(function() { counting(); }, countInTempo);
+  timerListenNote = 50;
+  console.log(acceptedPitches.length);
 }
 
 
