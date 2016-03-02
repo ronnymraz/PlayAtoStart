@@ -108,6 +108,7 @@ var bpm = 60;
 *various subdivisions, the current being for level 0.
 *To transfer this to level one just change these variables accordingly.
 */
+/*
 var subdivisions = {};
 subdivisions.subdivisions0 = [1, 1, 1, 1];
 subdivisions.subdivisions1 = [2, 2, 2, 2, 2, 2, 1];
@@ -118,10 +119,11 @@ var numSubdivisions = 3;
 var acceptedPitches = ["D", "F"]; //accepted pitches for level
 var pickDiv;
 var thisDiv;
+*/
 /*
 *
 */
-
+var thisRhythm;
 //var metronomeTime = 1000;//i dont think this actually does anything
 
 var timeStampArray = null;//will be populated with timestamps
@@ -147,7 +149,7 @@ var freq;
 var startTimeListenNote;
 var timerListenNote = 50;
 
-var warmupScene = true;
+var warmupScene = false;
 var trackWarmUp = [];
 var warmupNum = 100;
 
@@ -190,11 +192,14 @@ function setup() {
     /*
     *BEGIN GAMEPLAY ********************
     */
+    /*
     pickDiv = Math.floor(Math.random()*((numSubdivisions) - 0)) + 1;
     thisDiv = 'subdivisions' + pickDiv;
     print(thisDiv);
+    */
+    thisRhythm = SelectRhythm();
     //create our array of accepted timestamps as they correspond to this subdivision
-    timeStampArray = new Array(subdivisions[thisDiv].length);
+    timeStampArray = new Array(thisRhythm.length);
     hitArrray = new Array(timeStampArray.length);
     hitPitches = new Array(timeStampArray.length);
     rMissedArray = new Array(timeStampArray.length);
@@ -441,7 +446,7 @@ function counting(){
 */
 function StartMetronome(){
   //calculates the time of the current subdivision
-  var deltaTime = ((60/bpm)/subdivisions[thisDiv][divcounter])*1000 - 50;//50 second offset to account for latency that occurs with sample playback
+  var deltaTime = ((60/bpm)/thisRhythm[divcounter])*1000 - 50;//50 second offset to account for latency that occurs with sample playback
   /**
   *In order to play the accepted notes randomly, we return a random integer
   *based on the length of the accepted notes array. We use that index to obtain
@@ -454,7 +459,7 @@ function StartMetronome(){
   }      
 
 
-if (divcounter < subdivisions[thisDiv].length - 1){
+if (divcounter < thisRhythm.length - 1){
   divcounter++;
   setTimeout(function(){StartMetronome();}, deltaTime);
   if(!playExample){
@@ -616,9 +621,9 @@ function CheckTimestamp(givenTime, givenPitch){
 
 function PopulateTimestamps(){
   runningAccepted = startTime;
-  for(var i = 0; i < subdivisions[thisDiv].length; i++){
+  for(var i = 0; i < thisRhythm.length; i++){
     if(i>0){
-      var deltaTime = ((60/bpm)/subdivisions[thisDiv][i-1])*1000;
+      var deltaTime = ((60/bpm)/thisRhythm[i-1])*1000;
     }
     else{
       var deltaTime = ((60/bpm)/1)*1000;
@@ -723,9 +728,12 @@ function NewSession(){
   }
   //reset variables for a new round
   else{
+    /*
     pickDiv = Math.floor(Math.random()*((numSubdivisions) - 0)) + 1;
     thisDiv = 'subdivisions' + pickDiv;
-    timeStampArray = new Array(subdivisions[thisDiv].length);
+    */
+    thisRhythm = SelectRhythm();
+    timeStampArray = new Array(thisRhythm.length);
     hitArrray = new Array(timeStampArray.length);
     hitPitches = new Array(timeStampArray.length);
     rMissedArray = new Array(timeStampArray.length);
@@ -751,11 +759,14 @@ function Restart(){
   pitchBasedScore = 0;
   var countInTempo = (60/bpm)*1000;
 
+  /*
   pickDiv = Math.floor(Math.random()*((numSubdivisions) - 0)) + 1;
   thisDiv = 'subdivisions' + pickDiv;
+  */
+  thisRhythm = SelectRhythm();
   print(thisDiv);
   //create our array of accepted timestamps as they correspond to this subdivision
-  timeStampArray = new Array(subdivisions[thisDiv].length);
+  timeStampArray = new Array(thisRhythm.length);
   hitArrray = new Array(timeStampArray.length);
   hitPitches = new Array(timeStampArray.length);
   rMissedArray = new Array(timeStampArray.length);

@@ -385,5 +385,16 @@ var v = function(p){
 		canDebug = !canDebug;
 	}
 }
-
+function SelectRhythm(){
+	var subdivisions = {};
+	subdivisions.subdivisions0 = [1, 1, 1, 1];
+	subdivisions.subdivisions1 = [2, 2, 2, 2, 2, 2, 1];
+	subdivisions.subdivisions2 = [2, 2, 1, 2, 2, 1];
+	subdivisions.subdivisions3 = [1, 2, 2, 1, 1];
+	var numSubdivisions = 3;
+	var pickDiv = Math.floor(Math.random()*((numSubdivisions) - 0)) + 1;
+	var thisDiv = 'subdivisions' + pickDiv;
+	var rSelected = subdivisions[thisDiv];
+	return rSelected;
+}
 var myp5 = new p5(v, 'visualsContainer');
