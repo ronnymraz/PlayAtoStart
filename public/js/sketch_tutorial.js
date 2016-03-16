@@ -49,7 +49,7 @@ var v = function(p){
 			//p.rotate(this.rotation);
 			p.rect(0, 0, this.dimension.x, this.dimension.y);
 			p.fill(255);
-			p.text(note, 0, 0);	
+			p.text(note, 0, 0);
 			p.pop();
 		}
 
@@ -98,7 +98,7 @@ var v = function(p){
 				this.currentCorrectNote++;
 		}
 	}
-	
+
 	//ALWAYS HAVE A CORRECTNOTE() METHOD WHICH THEN CALLS THE DIFFERENT ANIMATIONS
 	handleCorrectNote = function(note){
 		if(canHandleNote){
@@ -119,7 +119,7 @@ var v = function(p){
 	}
 
 	setDownBeat = function(){
-		
+
 	}
 
 	pickRandomIndex = function(){
@@ -150,6 +150,7 @@ var v = function(p){
 		// p.text('current listen interval: ' + timerListenNote, 20 - p.windowWidth*0.5, 40 - p.windowHeight*0.5);
 	}
 
+
 	p.setup = function(){
 		var cnv = p.createCanvas(p.windowWidth, p.windowHeight);
 		cnv.position(0, 0);
@@ -163,7 +164,7 @@ var v = function(p){
 	};
 
 	p.draw = function(){
-		p.background(50, 50, 55);
+		p.image(bg_warmup, 0, 0);
 
 		p.stroke(0, 30);
 		p.strokeWeight(2);

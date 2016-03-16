@@ -41,7 +41,7 @@ var v = function(p){
 	}
 	//console.log('possible rotations:'+typeof possibleRotations);
 
-	
+
 
 	var Square = function(num, offset){
 		this.offset = offset;
@@ -123,7 +123,7 @@ var v = function(p){
 		p.strokeWeight(2);
 		p.stroke(150, beat_alpha);
 		p.noFill();
-		
+
 		for(var i = 0; i < 30; i++){
 			if(i % 2 == 0)
 				p.stroke(150, beat_alpha);
@@ -155,7 +155,7 @@ var v = function(p){
 		p.pop();
 		p.fill(5, 254, 167);
 		p.triangle(-p.width*0.75 - 125, p.height*2, -p.width*0.75 + 125, p.height*2, -p.width*0.75, p.height*1.75);
-		
+
 	}
 
 	showProceed = function(){
@@ -323,7 +323,7 @@ var v = function(p){
 			squaresRight[i] = new Square(i, p.width);
 			canChange[i] = false;
 		}
-		
+
 	};
 
 	p.draw = function(){
@@ -367,7 +367,7 @@ var v = function(p){
 
 		if(notesHit == squaresRight.length)
 			showProceed();
-			
+
 	};
 
 	p.keyPressed = function(){
@@ -385,16 +385,5 @@ var v = function(p){
 		canDebug = !canDebug;
 	}
 }
-function SelectRhythm(){
-	var subdivisions = {};
-	subdivisions.subdivisions0 = [1, 1, 1, 1];
-	subdivisions.subdivisions1 = [2, 2, 2, 2, 2, 2, 1];
-	subdivisions.subdivisions2 = [2, 2, 1, 2, 2, 1];
-	subdivisions.subdivisions3 = [1, 2, 2, 1, 1];
-	var numSubdivisions = 3;
-	var pickDiv = Math.floor(Math.random()*((numSubdivisions) - 0)) + 1;
-	var thisDiv = 'subdivisions' + pickDiv;
-	var rSelected = subdivisions[thisDiv];
-	return rSelected;
-}
+
 var myp5 = new p5(v, 'visualsContainer');

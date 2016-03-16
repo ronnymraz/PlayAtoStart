@@ -123,6 +123,7 @@ var thisDiv;
 /*
 *
 */
+var acceptedPitches = ["D", "F"]; //accepted pitches for level
 var thisRhythm;
 //var metronomeTime = 1000;//i dont think this actually does anything
 
@@ -150,28 +151,34 @@ var startTimeListenNote;
 var timerListenNote = 50;
 
 //are we at a warmup scene?
-var warmupScene = true;
+var warmupScene;
 //track the users warmup project
 var trackWarmUp = [];
 //number of correct "hits" the user needs 100 felt nice
 var warmupNum = 100;
+var warmupStage;
 
+var bg_warmup;
+var bg_level;
 
+function preload(){
+  bg_warmup = loadImage('../assets/warmup/'+warmupStage+'.jpg');
+  hiHatAnalog = loadSound('../assets/samples/hihat-analog.wav');
+  hihatDigital = loadSound('../assets/samples/hihat-digital.wav');//used for metronome, not included in sample array
+  kickAcoustic = loadSound('../assets/samples/kick-acoustic01.wav');
+  snare = loadSound('../assets/samples/snare-808.wav');
+}
 
 function setup() {
   noCanvas();
   noFill();
-
+bg_warmup.resize(windowWidth, windowHeight);
   audioContext = new AudioContext();
   //choose our initial subdivision
-
-
-
 
   print('date: '+Date.now());
 
   source = new p5.AudioIn();
-  //source.getSources();
   source.start();
 
   console.log(source);
@@ -210,10 +217,10 @@ function setup() {
     pitchHit = new Array(acceptedPitches.length);
 
 
-    hiHatAnalog= loadSound('hihat-analog.wav');
-    hihatDigital = loadSound('hihat-digital.wav');//used for metronome, not included in sample array
-    kickAcoustic = loadSound('kick-acoustic01.wav');
-    snare = loadSound('snare-808.wav');
+    // hiHatAnalog = loadSound('../assets/samples/hihat-analog.wav');
+    // hihatDigital = loadSound('../assets/samples/hihat-digital.wav');//used for metronome, not included in sample array
+    // kickAcoustic = loadSound('../assets/samples/kick-acoustic01.wav');
+    // snare = loadSound('../assets/samples/snare-808.wav');
     samples = [snare, kickAcoustic, hiHatAnalog];
     countInMetro = setInterval(function() { counting(); }, countInTempo);
     timerListenNote = 50;
@@ -715,8 +722,21 @@ function ScanPerfect(){
 function PassiveMetronome(){
   //CUE DOWNBEAT METRO VISUALS HERE
   print("Metronome downbeat");
-
 }
+
+function SelectRhythm(){
+	var subdivisions = {};
+	subdivisions.subdivisions0 = [1, 1, 1, 1];
+	subdivisions.subdivisions1 = [2, 2, 2, 2, 2, 2, 1];
+	subdivisions.subdivisions2 = [2, 2, 1, 2, 2, 1];
+	subdivisions.subdivisions3 = [1, 2, 2, 1, 1];
+	var numSubdivisions = 3;
+	var pickDiv = Math.floor(Math.random()*((numSubdivisions) - 0)) + 1;
+	var thisDiv = 'subdivisions' + pickDiv;
+	var rSelected = subdivisions[thisDiv];
+	return rSelected;
+}
+
 //If the player has played through 4 rounds and has rhythm and pitch scores above 55, they win
 //if the score is not above 55 after 4 rounds, the player continues for 2 more rounds
 //if the player fails to reach this score after 6 rounds in total, they fail the level
