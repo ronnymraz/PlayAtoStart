@@ -1,6 +1,6 @@
 /**
  *  Pitch Detection using Auto Correlation.
- *  
+ *
  *  Auto correlation multiplies each sample in a buffer by all
  *  of the other samples. This emphasizes the fundamental
  *  frequency.
@@ -10,7 +10,7 @@
  *
  *  We calculate the pitch by counting the number of samples
  *  between peaks.
- *  
+ *
  *  AutoCorrelation Example by Jason Sigal and Golan Levin.
  *
  *  Edited to inclde an amplitude threshold and monophonic pitch recognition by Ronny Mraz
@@ -38,10 +38,10 @@ var decayRate = 0.95;
 //array of absolute fundamentals
 var fundFreqs = [16.35, 17.32, 18.35, 19.45, 20.60, 21.83, 23.12, 24.50, 25.96, 27.50, 29.14, 30.87];
 //array of corresponding notes
-var pitches =   ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]; 
+var pitches =   ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 
 //no longer necessary with sample based playback
-var playFrequencies = {"C":261.63, "C#":277.18, "D":293.66, "D#":311.13,"E": 29.63,"F": 349.23, 
+var playFrequencies = {"C":261.63, "C#":277.18, "D":293.66, "D#":311.13,"E": 29.63,"F": 349.23,
 "F#":369.99, "G":392, "G#":415.3, "A":440, "A#":466.16, "B":493.88};
 
 var hitPitches = null;//keeps track of pitch hits that are in rhythm
@@ -61,14 +61,14 @@ var pitchHit = null;//KEEPS TRACK WHICH PITCHES HAVE BEEN HIT IN A PHRASE
 var rHasMissed = null; //have we missed in this window already
 var rMissedArray;
 
-var hiHatAnalog; 
+var hiHatAnalog;
 var hihatDigital;
 var kickAcoustic;
 var snare;
 
 var samples = [];
 
-//difference in frequencies (Hz) of absolute fundamentals 
+//difference in frequencies (Hz) of absolute fundamentals
 //can be used to create a more robust pitch detector
 //var compFloats = [.485, .515, 1.15, 1.23, 1.29, 1.38, 1.43, 1.54, 1.64,]
 
@@ -104,7 +104,7 @@ where as: [2,1] would produce an eigth and a quarter (ending on an upbeat), we d
 var bpm = 60;
 //EDIT SUBDIVISIONS
 // 1 = quarter, 2 = eigth, 3 = triplet 4 = sixteenth
-/* The subdivisions object will contain arrays of all the 
+/* The subdivisions object will contain arrays of all the
 *various subdivisions, the current being for level 0.
 *To transfer this to level one just change these variables accordingly.
 */
@@ -149,8 +149,11 @@ var freq;
 var startTimeListenNote;
 var timerListenNote = 50;
 
-var warmupScene = false;
+//are we at a warmup scene?
+var warmupScene = true;
+//track the users warmup project
 var trackWarmUp = [];
+//number of correct "hits" the user needs 100 felt nice
 var warmupNum = 100;
 
 
@@ -161,7 +164,7 @@ function setup() {
 
   audioContext = new AudioContext();
   //choose our initial subdivision
-  
+
 
 
 
@@ -182,6 +185,7 @@ function setup() {
   //count in a series of quarter notes to be printed to the console
   if(warmupScene){
     trackWarmUp = new Array(acceptedPitches.length);
+    //calibrate our hit array for the warmup, each array slot will count towards the warmup number for the number of pitches in the level
     for(var i = 0; i < trackWarmUp.length; i++){
       trackWarmUp[i] = 0;
       console.log(trackWarmUp[i]);
@@ -215,7 +219,7 @@ function setup() {
     timerListenNote = 50;
     console.log(acceptedPitches.length);
   }
-  
+
 }
 
 function draw() {
@@ -224,7 +228,7 @@ function draw() {
   // array of values from -1 to 1
   var timeDomain = fft.waveform(1024, 'float32');
   var corrBuff = autoCorrelate(timeDomain);
-  
+
 
 
   //only run calculations if the source amplitude is above the threshold
@@ -247,8 +251,8 @@ function draw() {
         WarmUpCorrectNotes(noteDis);
       }
 
-  }    
-    
+  }
+
 }
 
 /*
@@ -257,7 +261,7 @@ function draw() {
 
 // accepts a timeDomainBuffer and multiplies every value
 function autoCorrelate(timeDomainBuffer) {
-  
+
   var nSamples = timeDomainBuffer.length;
 
   // pre-normalize the input buffer
@@ -272,7 +276,7 @@ function autoCorrelate(timeDomainBuffer) {
 
   var autoCorrBuffer = [];
   for (var lag = 0; lag < nSamples; lag++){
-    var sum = 0; 
+    var sum = 0;
     for (var index = 0; index < nSamples; index++){
       var indexLagged = index+lag;
       if (indexLagged < nSamples){
@@ -321,7 +325,7 @@ function centerClip(buffer) {
   var nSamples = buffer.length;
 
   // center clip removes any samples whose abs is less than centerClipThreshold
-  centerClipThreshold = map(mouseY, 0, height, 0,1); 
+  centerClipThreshold = map(mouseY, 0, height, 0,1);
 
   if (centerClipThreshold > 0.0) {
     for (var i = 0; i < nSamples; i++) {
@@ -355,7 +359,7 @@ function findFrequency(autocorr) {
       }
     }
   }
-  
+
   var distanceToNextLargestPeak = indexOfLargestPeakSoFar - 0;
 
   // convert sample count to frequency
@@ -375,29 +379,29 @@ function findFrequency(autocorr) {
 //array of accepted pitches.
 function getNote(frequency){
 	//print(frequency);
-	
+
 	//comparision float difference to account for quartertones and artifacts
 	var compfloat = .465;
-	
+
 
 	//brings value to an absolute fundamental
 	while(frequency > 31.735){
 		frequency = frequency/2;
 	}
-	
+
   for(var i = 0; i < fundFreqs.length; i++){
    var minval = fundFreqs[i]-compfloat;
    var maxval = fundFreqs[i]+compfloat;
    if(between(frequency, minval, maxval)){
 				//get the indexed pitch value against the matched index
-				var pitch = pitches[i];	
+				var pitch = pitches[i];
 				//print(pitch);
-				return pitch;	
-				
+				return pitch;
+
 			}
 			//if we reach the end of the fundfrequency array, restart the loop with a larger comparative range
 			if(i == fundFreqs.length - 1){
-				i = 0;	
+				i = 0;
 				compfloat = compfloat+.005;
 			}
 		}
@@ -408,7 +412,7 @@ function getNote(frequency){
 
 function between(x, min, max){
 	return x>= min && x <= max;
-	
+
 }
 /* This method allows the player to set their tempo and triggers
 *all the calculations related to rythms. On the last beat of this count-in
@@ -418,7 +422,7 @@ function between(x, min, max){
 */
 function counting(){
   //The metronome is started on the first downbeat because of the order
-  //of operations inside of the StartMetronome() function. 
+  //of operations inside of the StartMetronome() function.
   if(countingint == 5){
     //print (countingint);
     StartMetronome();
@@ -440,9 +444,9 @@ function counting(){
 
 }
 /*
-*Start Metronome keeps track of the rhythmic pattern in the music, 
+*Start Metronome keeps track of the rhythmic pattern in the music,
 *this is how the program knows when to stop accepting input and
-*score the player. 
+*score the player.
 */
 function StartMetronome(){
   //calculates the time of the current subdivision
@@ -456,7 +460,7 @@ function StartMetronome(){
     var randomSample = Math.floor(Math.random()*((samples.length - 1) + 1)) + 0;
     var playSample = samples[randomSample];
     playSample.play();
-  }      
+  }
 
 
 if (divcounter < thisRhythm.length - 1){
@@ -485,10 +489,10 @@ else{
       setTimeout(function(){PRScores();}, 400);
       setTimeout(function(){NewSession();}, 450);
     }
-  
+
 
   }
-  
+
 }
 /*
 *Compares the given note against an array of accepted. If the note hit, we keep track
@@ -530,7 +534,11 @@ function TrackHitPitches(givenPitch){
   }
   return false;
 }
-
+/*
+* Iterate through our array of accepted pitches to check for matches.
+* each time we hit the pitch, increase the counter in the corresping (1:1)
+* trackWarmUp array, check this array after every registered pitch
+*/
 function WarmUpCorrectNotes(givenPitch){
   for(var i = 0; i < acceptedPitches.length; i++){
     if(givenPitch == acceptedPitches[i]){
@@ -542,6 +550,11 @@ function WarmUpCorrectNotes(givenPitch){
   CheckWarmup();
 
 }
+/*
+*Checks if each array index has has reached the warmup number,
+*until we reach the last index in the array.If any index has not reached
+*the value stored in warmUpNum, we break out of the for loop
+*/
 function CheckWarmup(){
   console.log("Checking warmup!");
   for(var j = 0; j < trackWarmUp.length; j++){
@@ -550,7 +563,7 @@ function CheckWarmup(){
       if(j == trackWarmUp.length - 1){
         console.log("Warmup Complete!");
         warmupScene = false;
-        Restart();
+        Restart(); //sets parameters for gameplay
       }else{
         continue;
       }
@@ -581,7 +594,7 @@ function CheckTimestamp(givenTime, givenPitch){
       print("Rhythm hit!");
       CompareNote(givenPitch, i);
       break;
-    
+
     }
     else if(i< timeStampArray.length && givenTime < timeStampArray[i+1]){
       //print("called missed: " + i);
@@ -606,16 +619,16 @@ function CheckTimestamp(givenTime, givenPitch){
         }
       break;
     }
-   
+
 
   }
 
 }
 /*Each time stamp must correspond to the time difference of the previous, the
-*time difference of a notes appearance in a piece of music corresponds to the 
+*time difference of a notes appearance in a piece of music corresponds to the
 *delta of the subdivision before it. For example, 2 eighth notes followed by a quarter.
-*Though our subdivison array would read [2, 2, 1], it would take the length of an eightnote 
-*for the quarter to sound, not the length of a quarter. 
+*Though our subdivison array would read [2, 2, 1], it would take the length of an eightnote
+*for the quarter to sound, not the length of a quarter.
 */
 
 
@@ -647,7 +660,7 @@ function RhythmScore(){
     }
   }
   rhythmicScore = score/hitArrray.length * 100;
-  
+
   totalRhythmScore += rhythmicScore;
   print(rhythmicScore);
 
@@ -656,11 +669,11 @@ function RhythmScore(){
 function PitchScore(){
   var pScore = 0;
   var missedPitch = ""
-  
+
   for(var i = 0; i < hitPitches.length; i++){
     if(hitPitches[i] == "hit"){
       pScore++;
-    } 
+    }
   }
   for(var i = 0; i < pitchHit.length; i++){
     //keeps track of the pitches the user missed to give valuable feedback
@@ -782,12 +795,3 @@ function Restart(){
   timerListenNote = 50;
   console.log(acceptedPitches.length);
 }
-
-
-
-
-
-
-
-
-
