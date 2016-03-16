@@ -164,7 +164,7 @@ var v = function(p){
 	};
 
 	p.draw = function(){
-		p.image(bg_warmup, 0, 0);
+		p.image(bg, 0, 0);
 
 		p.stroke(0, 30);
 		p.strokeWeight(2);

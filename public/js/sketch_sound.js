@@ -157,12 +157,17 @@ var trackWarmUp = [];
 //number of correct "hits" the user needs 100 felt nice
 var warmupNum = 100;
 var warmupStage;
+var levelStage;
 
-var bg_warmup;
-var bg_level;
+var bg;
 
 function preload(){
-  bg_warmup = loadImage('../assets/warmup/'+warmupStage+'.jpg');
+  if(warmup){
+    bg = loadImage('../assets/warmup/'+warmupStage+'.jpg');
+  }else{
+    bg = loadImage('../assets/levels/'+levelStage+'.jpg');
+  }
+
   hiHatAnalog = loadSound('../assets/samples/hihat-analog.wav');
   hihatDigital = loadSound('../assets/samples/hihat-digital.wav');//used for metronome, not included in sample array
   kickAcoustic = loadSound('../assets/samples/kick-acoustic01.wav');
@@ -172,7 +177,7 @@ function preload(){
 function setup() {
   noCanvas();
   noFill();
-bg_warmup.resize(windowWidth, windowHeight);
+  bg.resize(windowWidth, windowHeight);
   audioContext = new AudioContext();
   //choose our initial subdivision
 

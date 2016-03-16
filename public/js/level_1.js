@@ -327,7 +327,7 @@ var v = function(p){
 	};
 
 	p.draw = function(){
-		p.background(250, 170, 185);
+		p.image(bg, 0, 0);
 		drawPoints();
 		p.translate(p.width*0.5, p.height*0.35);
 		p.fill(0);
