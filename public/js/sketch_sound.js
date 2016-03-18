@@ -174,6 +174,10 @@ function preload(){
   snare = loadSound('../assets/samples/snare-808.wav');
 }
 
+function windowResized(){
+  bg.resize(windowWidth, windowHeight);
+}
+
 function setup() {
   noCanvas();
   noFill();
