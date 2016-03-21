@@ -97,32 +97,11 @@ var waitForCountIn = false;
 *The BPM and subdivision system is completely dynamic between
 *the bpm, and subdivisions up to a sixteenth. Just make sure they make sense
 * For example: [2, 2, 1] would produce 2 eigthnotes and a quarter, ending on proper downbeats
-where as: [2,1] would produce an eigth and a quarter (ending on an upbeat), we dont want that type of uneven rhythm yet
-(though it would still work, its not optimal for testing)
+where as: [2,1] would produce an eigth and a quarter (ending on an upbeat)
 */
 //EDIT BPM
 var bpm = 60;
-//EDIT SUBDIVISIONS
-// 1 = quarter, 2 = eigth, 3 = triplet 4 = sixteenth
-/* The subdivisions object will contain arrays of all the
-*various subdivisions, the current being for level 0.
-*To transfer this to level one just change these variables accordingly.
-*/
-/*
-var subdivisions = {};
-subdivisions.subdivisions0 = [1, 1, 1, 1];
-subdivisions.subdivisions1 = [2, 2, 2, 2, 2, 2, 1];
-subdivisions.subdivisions2 = [2, 2, 1, 2, 2, 1];
-subdivisions.subdivisions3 = [1, 2, 2, 1, 1];
-var numSubdivisions = 3;
-//EDIT ACCEPTED PITCHEST
-var acceptedPitches = ["D", "F"]; //accepted pitches for level
-var pickDiv;
-var thisDiv;
-*/
-/*
-*
-*/
+
 var acceptedPitches = ["D", "F"]; //accepted pitches for level
 var thisRhythm;
 //var metronomeTime = 1000;//i dont think this actually does anything
