@@ -198,15 +198,15 @@ function setup() {
 
   fft = new p5.FFT();
   fft.setInput(lowPass);
-  //count in a series of quarter notes to be printed to the console
-  if(warmupScene){
+  
+  if(warmup){
     trackWarmUp = new Array(acceptedPitches.length);
     //calibrate our hit array for the warmup, each array slot will count towards the warmup number for the number of pitches in the level
     for(var i = 0; i < trackWarmUp.length; i++){
       trackWarmUp[i] = 0;
       console.log(trackWarmUp[i]);
     }
-
+    //count in a series of quarter notes to be printed to the console
   }else{
     var countInTempo = (60/bpm)*1000;
     /*
@@ -252,7 +252,7 @@ function draw() {
   if(volume > threshold + cutoff){
     freq = findFrequency(corrBuff);
      noteDis = getNote(freq);
-     if(!isCountingIn && !playExample && !hasScored && !warmupScene){//are we done counting in? start checking rhythm
+     if(!isCountingIn && !playExample && !hasScored && !warmup){//are we done counting in? start checking rhythm
       //print("passsed threshold");
         if(waitForCountIn){
           waitForCountIn = false;
@@ -263,7 +263,7 @@ function draw() {
           var newTimeStamp = Date.now();
           CheckTimestamp(newTimeStamp, noteDis);
         }
-      }else if(warmupScene){
+      }else if(warmup){
         WarmUpCorrectNotes(noteDis);
       }
 
@@ -578,7 +578,7 @@ function CheckWarmup(){
     if(trackWarmUp[j] > warmupNum){
       if(j == trackWarmUp.length - 1){
         console.log("Warmup Complete!");
-        warmupScene = false;
+        warmup = false;
         Restart(); //sets parameters for gameplay
       }else{
         continue;
@@ -732,7 +732,8 @@ function PassiveMetronome(){
   //CUE DOWNBEAT METRO VISUALS HERE
   print("Metronome downbeat");
 }
-
+//Moved to top level stage-specific script - will be deleted from this script after new visuals are stable
+/*
 function SelectRhythm(){
 	var subdivisions = {};
 	subdivisions.subdivisions0 = [1, 1, 1, 1];
@@ -745,7 +746,7 @@ function SelectRhythm(){
 	var rSelected = subdivisions[thisDiv];
 	return rSelected;
 }
-
+*/
 //If the player has played through 4 rounds and has rhythm and pitch scores above 55, they win
 //if the score is not above 55 after 4 rounds, the player continues for 2 more rounds
 //if the player fails to reach this score after 6 rounds in total, they fail the level
