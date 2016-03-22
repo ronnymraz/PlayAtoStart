@@ -20,7 +20,7 @@
 
 /*
 delta bpm formula:
-deltaTime = ((bpm/60)/subdivision) * 1000
+deltaTime = ((60/bpm)/subdivision) * 1000 (in ms)
 
 TURN ON CONSOLE VIEW FOR RHTYHMIC FEEDBACK
 
@@ -100,7 +100,7 @@ var waitForCountIn = false;
 where as: [2,1] would produce an eigth and a quarter (ending on an upbeat)
 */
 //EDIT BPM
-var bpm = 60;
+var bpm = 70;
 
 var acceptedPitches = []; //accepted pitches for level
 var thisRhythm;
@@ -578,8 +578,8 @@ function CheckWarmup(){
 function CheckTimestamp(givenTime, givenPitch){
   //print("CheckTimestamp");
   for(var i = 0; i < timeStampArray.length; i++){
-    var mintime = timeStampArray[i]-100;
-    var maxtime = timeStampArray[i]+100;
+    var mintime = timeStampArray[i]-120;
+    var maxtime = timeStampArray[i]+120;
     if (between(givenTime, mintime, maxtime) && hasHit != i){
       hasHit = i; //this timestamp is marked as a hit
       hitArrray[i] = "hit";
