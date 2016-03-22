@@ -102,7 +102,7 @@ where as: [2,1] would produce an eigth and a quarter (ending on an upbeat)
 //EDIT BPM
 var bpm = 60;
 
-var acceptedPitches = ["D", "F"]; //accepted pitches for level
+var acceptedPitches = []; //accepted pitches for level
 var thisRhythm;
 //var metronomeTime = 1000;//i dont think this actually does anything
 
@@ -558,7 +558,8 @@ function CheckWarmup(){
       if(j == trackWarmUp.length - 1){
         console.log("Warmup Complete!");
         warmup = false;
-        Restart(); //sets parameters for gameplay
+        BeginLevel();
+        //Restart(); //sets parameters for gameplay
       }else{
         continue;
       }
