@@ -32,7 +32,7 @@ var source, fft, lowPass;
 
 
 
-var threshold = 0.1;//alter amplitude threshold
+var threshold = 0.25;//alter amplitude threshold
 var cutoff = 0;
 var decayRate = 0.95;
 //array of absolute fundamentals
@@ -427,8 +427,9 @@ function counting(){
     hihatDigital.play();
     startTime = Date.now();
     PopulateTimestamps();
-    isCountingIn = false;
+    //isCountingIn = false;
     var passiveMetroTempo = (60/bpm)*1000;
+    setInterval(function(){isCountingIn = false;}, passiveMetroTempo/2);
     setPassiveMetronome = setInterval(function() { PassiveMetronome(); }, passiveMetroTempo); //basic downbeat metronome
     countingint++;
   }else{
@@ -584,8 +585,9 @@ function CheckWarmup(){
 function CheckTimestamp(givenTime, givenPitch){
   //print("CheckTimestamp");
   for(var i = 0; i < timeStampArray.length; i++){
-    var mintime = timeStampArray[i]-120;
-    var maxtime = timeStampArray[i]+120;
+      var mintime = timeStampArray[i]-175;
+      var maxtime = timeStampArray[i]+175;
+   
     if (between(givenTime, mintime, maxtime) && hasHit != i){
       hasHit = i; //this timestamp is marked as a hit
       hitArrray[i] = "hit";
@@ -594,6 +596,9 @@ function CheckTimestamp(givenTime, givenPitch){
       //WHEN USING THIS DATA FOR VISUALS, HIT WOULD BE RETURNED INSTEAD OF PRINTED TO THE CONSOLE
       print(i);
       print("Rhythm hit!");
+      print("MinTime " + mintime);
+      print(givenTime);
+      print("maxtime " + maxtime);
       CompareNote(givenPitch, i);
       break;
 
@@ -609,6 +614,9 @@ function CheckTimestamp(givenTime, givenPitch){
         else if(i == timeStampArray.length - 1){
           print("Rhythm missed!");
           print(i);
+          print("MinTime " + mintime);
+          print(givenTime);
+          print("maxtime " + maxtime);
           CompareNote(givenPitch, i);
           rHasMissed = i; //accounts for duplicates
           break;
@@ -616,6 +624,9 @@ function CheckTimestamp(givenTime, givenPitch){
         else{
           print(i);
           print("Rhythm missed!");
+            print("MinTime " + mintime);
+          print(givenTime);
+          print("maxtime " + maxtime);
           CompareNote(givenPitch, i);
           rHasMissed = i;  //accounts for duplicates
         }
@@ -664,7 +675,7 @@ function RhythmScore(){
   rhythmicScore = score/hitArrray.length * 100;
 
   totalRhythmScore += rhythmicScore;
-  print(rhythmicScore);
+  print("Rhythm Score: " + rhythmicScore);
 
 }
 
@@ -685,7 +696,7 @@ function PitchScore(){
   }
   pitchBasedScore = pScore/hitPitches.length * 100;
   totalPitchScore += pitchBasedScore;
-  print(pitchBasedScore);
+  print("Pitch Score: " + pitchBasedScore);
   print("Missed Pitches: " + missedPitch);
 }
 //Overall scores throughout the level
@@ -701,6 +712,7 @@ function PRScores(){
   //Was this a perfect round?
   if(rhythmicScore == 100 && pitchBasedScore == 100){
     perfectArray[playCount] = "perfect";
+    print("PERFECT ROUND!!");
   }
 
 }
