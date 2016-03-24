@@ -183,7 +183,7 @@ function setup() {
     //calibrate our hit array for the warmup, each array slot will count towards the warmup number for the number of pitches in the level
     for(var i = 0; i < trackWarmUp.length; i++){
       trackWarmUp[i] = 0;
-      console.log(trackWarmUp[i]);
+      //console.log(trackWarmUp[i]);
     }
     //count in a series of quarter notes to be printed to the console
   }else{
@@ -533,13 +533,19 @@ function TrackHitPitches(givenPitch){
 * Iterate through our array of accepted pitches to check for matches.
 * each time we hit the pitch, increase the counter in the corresping (1:1)
 * trackWarmUp array, check this array after every registered pitch
+*
+*When the warmup tracking integer hits 100 for a corresponding note, the player
+*no longer needs to play that note
 */
 function WarmUpCorrectNotes(givenPitch){
   for(var i = 0; i < acceptedPitches.length; i++){
     if(givenPitch == acceptedPitches[i]){
+      //This integer index corresponds to the visual progress bar
       trackWarmUp[i] += 1;
-      console.log("Warmup Pitch! " + givenPitch);
+      console.log("Warmup Pitch is Correct! " + givenPitch);
       console.log(trackWarmUp[i]);
+    }else{
+      console.log("Incorrecct Warmup Pitch " + givenPitch);
     }
   }
   CheckWarmup();
