@@ -50,7 +50,7 @@ var v = function(p){
 		this.globalRotationInc = 0.001;
 		this.positionX = (Math.random()+1)*600;
 		this.positionY = Math.random()*100;
-		this.dimension = p.createVector(100+Math.random()*1, 200+Math.random()*20);
+		this.dimension = p.createVector(Math.random()*4000+width*10, -height*10-Math.random()*height*20);
 		this.startColor = p.color(Math.random()*55, Math.random()*55, Math.random()*55, 100);
 		this.currentColor = this.startColor;
 		if(this.offset < 0)
@@ -73,11 +73,21 @@ var v = function(p){
 			p.noStroke();
 			p.rectMode(p.CENTER);
 			p.push();
-			p.translate(this.offset, -height*2);
-			p.rotate(this.rotation);
+			p.translate(this.dimension.x, this.dimension.y);
+			// p.rotate(this.rotation);
 			p.scale(1);
-			p.triangle(0, (Math.cos(this.oscillation)+4)*20, -this.dimension.x*0.75, this.dimension.y, this.dimension.x*0.75, this.dimension.y);
+			p.ellipse(0, 0, 50, 50);
+			// p.triangle(0, (Math.cos(this.oscillation)+4)*20, -this.dimension.x*0.75, this.dimension.y, this.dimension.x*0.75, this.dimension.y);
 			p.pop();
+
+
+			this.dimension.x -= 15;
+			this.dimension.y += 10;
+
+			if(this.dimension.y > height*6){
+				this.dimension.x = Math.random()*4000+width*7;
+				this.dimension.y = -height*10-Math.random()*height*20;
+			}
 		}
 
 		this.react = function(){
@@ -87,13 +97,21 @@ var v = function(p){
 			p.noStroke();
 			p.rectMode(p.CENTER);
 			p.push();
-			p.translate(this.offset, -height*2);
-			p.rotate(this.rotation);
+			p.translate(this.dimension.x, this.dimension.y);
+			// p.rotate(this.rotation);
 			p.scale(1);
-			p.triangle(0, (Math.cos(this.oscillation)+4)*20, -this.dimension.x*0.75-(this.reactScaleVal*0.5), this.dimension.y+this.reactScaleVal, this.dimension.x*0.75+(this.reactScaleVal*0.5), this.dimension.y+this.reactScaleVal);
-			var middle = p.createVector(0, this.dimension.y);
-			//p.line(0, 0, middle.x, middle.y);
+			p.ellipse(0, 0, 100, 100);
+			// p.triangle(0, (Math.cos(this.oscillation)+4)*20, -this.dimension.x*0.75, this.dimension.y, this.dimension.x*0.75, this.dimension.y);
 			p.pop();
+
+
+			this.dimension.x -= 15;
+			this.dimension.y += 10;
+
+			if(this.dimension.y > height*6){
+				this.dimension.x = Math.random()*4000+width*10;
+				this.dimension.y = -height*10-Math.random()*height*20;
+			}
 
 			if(this.reactScaleVal < this.reactScaleThreshold){
 				this.reactScaleVal += this.reactScaleInc*2;
@@ -293,7 +311,7 @@ var v = function(p){
 
 
 
-		drawBody();
+		// drawBody();
 
 		drawNotes();
 		drawBeat();

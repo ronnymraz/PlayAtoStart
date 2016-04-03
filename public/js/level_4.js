@@ -44,6 +44,7 @@ var v = function(p){
 
 
 	var Square = function(num, offset){
+		this.num = num;
 		this.offset = offset;
 		this.rotation = possibleRotations[num];
 		this.oscillation = 0;
@@ -73,10 +74,12 @@ var v = function(p){
 			p.noStroke();
 			p.rectMode(p.CENTER);
 			p.push();
-			p.translate(this.offset, -height*2);
-			p.rotate(this.rotation);
+			p.translate(this.offset, 0);
+			// p.rotate(this.rotation);
 			p.scale(1);
-			p.triangle(0, (Math.cos(this.oscillation)+4)*20, -this.dimension.x*0.75, this.dimension.y, this.dimension.x*0.75, this.dimension.y);
+			// p.triangle(0, (Math.cos(this.oscillation)+4)*20, -this.dimension.x*0.75, this.dimension.y, this.dimension.x*0.75, this.dimension.y);
+			p.rect(this.num*100, height*6, 20, height*12);
+
 			p.pop();
 		}
 
@@ -87,12 +90,12 @@ var v = function(p){
 			p.noStroke();
 			p.rectMode(p.CENTER);
 			p.push();
-			p.translate(this.offset, -height*2);
-			p.rotate(this.rotation);
+			p.translate(this.offset, 0);
+			// p.rotate(this.rotation);
 			p.scale(1);
-			p.triangle(0, (Math.cos(this.oscillation)+4)*20, -this.dimension.x*0.75-(this.reactScaleVal*0.5), this.dimension.y+this.reactScaleVal, this.dimension.x*0.75+(this.reactScaleVal*0.5), this.dimension.y+this.reactScaleVal);
-			var middle = p.createVector(0, this.dimension.y);
-			//p.line(0, 0, middle.x, middle.y);
+			// p.triangle(0, (Math.cos(this.oscillation)+4)*20, -this.dimension.x*0.75, this.dimension.y, this.dimension.x*0.75, this.dimension.y);
+			p.rect(this.num*100, height*6, 80, height*16);
+
 			p.pop();
 
 			if(this.reactScaleVal < this.reactScaleThreshold){
@@ -293,7 +296,7 @@ var v = function(p){
 
 
 
-		drawBody();
+		// drawBody();
 
 		drawNotes();
 		drawBeat();

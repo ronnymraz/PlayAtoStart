@@ -43,14 +43,15 @@ var v = function(p){
 
 
 
-	var Square = function(num, offset){
+	var Square = function(num, offset, type){
+		this.t = type;
 		this.offset = offset;
 		this.rotation = possibleRotations[num];
 		this.oscillation = 0;
 		this.globalRotationInc = 0.001;
 		this.positionX = (Math.random()+1)*600;
 		this.positionY = Math.random()*100;
-		this.dimension = p.createVector(100+Math.random()*1, 200+Math.random()*20);
+		this.dimension = p.createVector(100+Math.random()*1, 150+Math.random()*20);
 		this.startColor = p.color(Math.random()*55, Math.random()*55, Math.random()*55, 100);
 		this.currentColor = this.startColor;
 		if(this.offset < 0)
@@ -73,10 +74,18 @@ var v = function(p){
 			p.noStroke();
 			p.rectMode(p.CENTER);
 			p.push();
-			p.translate(this.offset, -height*2);
+			p.translate(this.offset, 0);
+			
+			if(this.t == 0)
 			p.rotate(this.rotation);
-			p.scale(1);
-			p.triangle(0, (Math.cos(this.oscillation)+4)*20, -this.dimension.x*0.75, this.dimension.y, this.dimension.x*0.75, this.dimension.y);
+			else
+			p.rotate(-this.rotation);
+
+			p.scale(2);
+			if(this.t == 0)
+				p.triangle(0, (Math.cos(this.oscillation)+4)*20, -this.dimension.x*0.75, this.dimension.y, this.dimension.x*0.75, this.dimension.y);
+			else
+				p.triangle(0, (Math.cos(-this.oscillation)+4)*20, -this.dimension.x*0.75, this.dimension.y, this.dimension.x*0.75, this.dimension.y);
 			p.pop();
 		}
 
@@ -87,11 +96,14 @@ var v = function(p){
 			p.noStroke();
 			p.rectMode(p.CENTER);
 			p.push();
-			p.translate(this.offset, -height*2);
+			p.translate(this.offset, 0);
 			p.rotate(this.rotation);
-			p.scale(1);
+			p.scale(2);
+			if(this.t == 0)
 			p.triangle(0, (Math.cos(this.oscillation)+4)*20, -this.dimension.x*0.75-(this.reactScaleVal*0.5), this.dimension.y+this.reactScaleVal, this.dimension.x*0.75+(this.reactScaleVal*0.5), this.dimension.y+this.reactScaleVal);
-			var middle = p.createVector(0, this.dimension.y);
+			else
+			p.triangle(0, (Math.cos(-this.oscillation)+4)*20, -this.dimension.x*0.75-(this.reactScaleVal*0.5), this.dimension.y+this.reactScaleVal, this.dimension.x*0.75+(this.reactScaleVal*0.5), this.dimension.y+this.reactScaleVal);
+			// var middle = p.createVector(0, this.dimension.y);
 			//p.line(0, 0, middle.x, middle.y);
 			p.pop();
 
@@ -277,8 +289,8 @@ var v = function(p){
 		var cnv = p.createCanvas(p.windowWidth, p.windowHeight);
 		cnv.position(0, 0);
 		for(var i = 0; i < squaresNum; i++){
-			squares[i] = new Square(i, -p.width*0.45);
-			squaresRight[i] = new Square(i, p.width*0.45);
+			squares[i] = new Square(i, -p.width*0.1, 0);
+			squaresRight[i] = new Square(i, p.width*0.1, 1);
 			canChange[i] = false;
 		}
 
@@ -287,13 +299,13 @@ var v = function(p){
 	p.draw = function(){
 		p.image(bg, 0, 0);
 		//drawPoints();
-		p.translate(p.width*0.5, p.height*0.35);
+		p.translate(p.width*0.5, p.height*0.45);
 		p.fill(0);
 		p.text('click', 0, -p.windowHeight*0.5 + 20);
 
 
 
-		drawBody();
+		// drawBody();
 
 		drawNotes();
 		drawBeat();

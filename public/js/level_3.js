@@ -12,7 +12,7 @@ var v = function(p){
 
 	var canDebug = false;
 
-	var squaresNum = 18;
+	var squaresNum = 40;
 	var squares = [];
 	var squaresRight = [];
 	var polygons = [];
@@ -44,6 +44,7 @@ var v = function(p){
 
 
 	var Square = function(num, offset){
+		this.num = num;
 		this.offset = offset;
 		this.rotation = possibleRotations[num];
 		this.oscillation = 0;
@@ -73,10 +74,10 @@ var v = function(p){
 			p.noStroke();
 			p.rectMode(p.CENTER);
 			p.push();
-			p.translate(this.offset, -height*2);
-			p.rotate(this.rotation);
-			p.scale(1);
-			p.triangle(0, (Math.cos(this.oscillation)+4)*20, -this.dimension.x*0.75, this.dimension.y, this.dimension.x*0.75, this.dimension.y);
+			p.rotate(this.rotation*0.01*this.num);
+			p.scale(3);
+			// p.triangle(0, (Math.cos(this.oscillation)+4)*20, -this.dimension.x*0.75, this.dimension.y, this.dimension.x*0.75, this.dimension.y);
+			p.rect(noise(millis()*0.0001, this.num)*800-400, noise(millis()*0.0001, this.num), 100, 100);
 			p.pop();
 		}
 
@@ -87,12 +88,10 @@ var v = function(p){
 			p.noStroke();
 			p.rectMode(p.CENTER);
 			p.push();
-			p.translate(this.offset, -height*2);
-			p.rotate(this.rotation);
-			p.scale(1);
-			p.triangle(0, (Math.cos(this.oscillation)+4)*20, -this.dimension.x*0.75-(this.reactScaleVal*0.5), this.dimension.y+this.reactScaleVal, this.dimension.x*0.75+(this.reactScaleVal*0.5), this.dimension.y+this.reactScaleVal);
-			var middle = p.createVector(0, this.dimension.y);
-			//p.line(0, 0, middle.x, middle.y);
+			p.rotate(this.rotation*0.01*this.num);
+			p.scale(3);
+			// p.triangle(0, (Math.cos(this.oscillation)+4)*20, -this.dimension.x*0.75, this.dimension.y, this.dimension.x*0.75, this.dimension.y);
+			p.rect(noise(millis()*0.0005, this.num)*1200-800, noise(millis()*0.0005, this.num), 100, 100);
 			p.pop();
 
 			if(this.reactScaleVal < this.reactScaleThreshold){
@@ -278,7 +277,7 @@ var v = function(p){
 		cnv.position(0, 0);
 		for(var i = 0; i < squaresNum; i++){
 			squares[i] = new Square(i, -p.width*0.45);
-			squaresRight[i] = new Square(i, p.width*0.45);
+			// squaresRight[i] = new Square(i, p.width*0.45);
 			canChange[i] = false;
 		}
 
@@ -291,10 +290,6 @@ var v = function(p){
 		p.fill(0);
 		p.text('click', 0, -p.windowHeight*0.5 + 20);
 
-
-
-		drawBody();
-
 		drawNotes();
 		drawBeat();
 
@@ -305,14 +300,14 @@ var v = function(p){
 			if(canChange[i]){
 				squares[i].changeColor();
 				squares[i].react();
-				squaresRight[i].changeColor();
-				squaresRight[i].react();
+				// squaresRight[i].changeColor();
+				// squaresRight[i].react();
 			}else{
 				// allDone = false;
 			}
 
 			squares[i].show();
-			squaresRight[i].show();
+			// squaresRight[i].show();
 		}
 
 		drawCharacter();
