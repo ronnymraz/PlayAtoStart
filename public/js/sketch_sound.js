@@ -20,7 +20,7 @@
 
 /*
 delta bpm formula:
-deltaTime = ((bpm/60)/subdivision) * 1000
+deltaTime = ((60/bpm)/subdivision) * 1000 (in ms)
 
 TURN ON CONSOLE VIEW FOR RHTYHMIC FEEDBACK
 
@@ -32,7 +32,7 @@ var source, fft, lowPass;
 
 
 
-var threshold = 0.1;//alter amplitude threshold
+var threshold = 0.25;//alter amplitude threshold
 var cutoff = 0;
 var decayRate = 0.95;
 //array of absolute fundamentals
@@ -97,33 +97,12 @@ var waitForCountIn = false;
 *The BPM and subdivision system is completely dynamic between
 *the bpm, and subdivisions up to a sixteenth. Just make sure they make sense
 * For example: [2, 2, 1] would produce 2 eigthnotes and a quarter, ending on proper downbeats
-where as: [2,1] would produce an eigth and a quarter (ending on an upbeat), we dont want that type of uneven rhythm yet
-(though it would still work, its not optimal for testing)
+where as: [2,1] would produce an eigth and a quarter (ending on an upbeat)
 */
 //EDIT BPM
-var bpm = 60;
-//EDIT SUBDIVISIONS
-// 1 = quarter, 2 = eigth, 3 = triplet 4 = sixteenth
-/* The subdivisions object will contain arrays of all the
-*various subdivisions, the current being for level 0.
-*To transfer this to level one just change these variables accordingly.
-*/
-/*
-var subdivisions = {};
-subdivisions.subdivisions0 = [1, 1, 1, 1];
-subdivisions.subdivisions1 = [2, 2, 2, 2, 2, 2, 1];
-subdivisions.subdivisions2 = [2, 2, 1, 2, 2, 1];
-subdivisions.subdivisions3 = [1, 2, 2, 1, 1];
-var numSubdivisions = 3;
-//EDIT ACCEPTED PITCHEST
-var acceptedPitches = ["D", "F"]; //accepted pitches for level
-var pickDiv;
-var thisDiv;
-*/
-/*
-*
-*/
-var acceptedPitches = ["D", "F"]; //accepted pitches for level
+var bpm = 70;
+
+var acceptedPitches = []; //accepted pitches for level
 var thisRhythm;
 //var metronomeTime = 1000;//i dont think this actually does anything
 
@@ -198,15 +177,15 @@ function setup() {
 
   fft = new p5.FFT();
   fft.setInput(lowPass);
-  //count in a series of quarter notes to be printed to the console
-  if(warmupScene){
+  
+  if(warmup){
     trackWarmUp = new Array(acceptedPitches.length);
     //calibrate our hit array for the warmup, each array slot will count towards the warmup number for the number of pitches in the level
     for(var i = 0; i < trackWarmUp.length; i++){
       trackWarmUp[i] = 0;
-      console.log(trackWarmUp[i]);
+      //console.log(trackWarmUp[i]);
     }
-
+    //count in a series of quarter notes to be printed to the console
   }else{
     var countInTempo = (60/bpm)*1000;
     /*
@@ -252,7 +231,7 @@ function draw() {
   if(volume > threshold + cutoff){
     freq = findFrequency(corrBuff);
      noteDis = getNote(freq);
-     if(!isCountingIn && !playExample && !hasScored && !warmupScene){//are we done counting in? start checking rhythm
+     if(!isCountingIn && !playExample && !hasScored && !warmup){//are we done counting in? start checking rhythm
       //print("passsed threshold");
         if(waitForCountIn){
           waitForCountIn = false;
@@ -263,7 +242,7 @@ function draw() {
           var newTimeStamp = Date.now();
           CheckTimestamp(newTimeStamp, noteDis);
         }
-      }else if(warmupScene){
+      }else if(warmup){
         WarmUpCorrectNotes(noteDis);
       }
 
@@ -448,8 +427,9 @@ function counting(){
     hihatDigital.play();
     startTime = Date.now();
     PopulateTimestamps();
-    isCountingIn = false;
+    //isCountingIn = false;
     var passiveMetroTempo = (60/bpm)*1000;
+    setInterval(function(){isCountingIn = false;}, passiveMetroTempo/2);
     setPassiveMetronome = setInterval(function() { PassiveMetronome(); }, passiveMetroTempo); //basic downbeat metronome
     countingint++;
   }else{
@@ -554,13 +534,19 @@ function TrackHitPitches(givenPitch){
 * Iterate through our array of accepted pitches to check for matches.
 * each time we hit the pitch, increase the counter in the corresping (1:1)
 * trackWarmUp array, check this array after every registered pitch
+*
+*When the warmup tracking integer hits 100 for a corresponding note, the player
+*no longer needs to play that note
 */
 function WarmUpCorrectNotes(givenPitch){
   for(var i = 0; i < acceptedPitches.length; i++){
     if(givenPitch == acceptedPitches[i]){
+      //This integer index corresponds to the visual progress bar
       trackWarmUp[i] += 1;
-      console.log("Warmup Pitch! " + givenPitch);
+      console.log("Warmup Pitch is Correct! " + givenPitch);
       console.log(trackWarmUp[i]);
+    }else{
+      console.log("Incorrecct Warmup Pitch " + givenPitch);
     }
   }
   CheckWarmup();
@@ -578,8 +564,9 @@ function CheckWarmup(){
     if(trackWarmUp[j] > warmupNum){
       if(j == trackWarmUp.length - 1){
         console.log("Warmup Complete!");
-        warmupScene = false;
-        Restart(); //sets parameters for gameplay
+        warmup = false;
+        BeginLevel();
+        //Restart(); //sets parameters for gameplay
       }else{
         continue;
       }
@@ -598,8 +585,9 @@ function CheckWarmup(){
 function CheckTimestamp(givenTime, givenPitch){
   //print("CheckTimestamp");
   for(var i = 0; i < timeStampArray.length; i++){
-    var mintime = timeStampArray[i]-100;
-    var maxtime = timeStampArray[i]+100;
+      var mintime = timeStampArray[i]-175;
+      var maxtime = timeStampArray[i]+175;
+   
     if (between(givenTime, mintime, maxtime) && hasHit != i){
       hasHit = i; //this timestamp is marked as a hit
       hitArrray[i] = "hit";
@@ -608,6 +596,9 @@ function CheckTimestamp(givenTime, givenPitch){
       //WHEN USING THIS DATA FOR VISUALS, HIT WOULD BE RETURNED INSTEAD OF PRINTED TO THE CONSOLE
       print(i);
       print("Rhythm hit!");
+      print("MinTime " + mintime);
+      print(givenTime);
+      print("maxtime " + maxtime);
       CompareNote(givenPitch, i);
       break;
 
@@ -623,6 +614,9 @@ function CheckTimestamp(givenTime, givenPitch){
         else if(i == timeStampArray.length - 1){
           print("Rhythm missed!");
           print(i);
+          print("MinTime " + mintime);
+          print(givenTime);
+          print("maxtime " + maxtime);
           CompareNote(givenPitch, i);
           rHasMissed = i; //accounts for duplicates
           break;
@@ -630,6 +624,9 @@ function CheckTimestamp(givenTime, givenPitch){
         else{
           print(i);
           print("Rhythm missed!");
+            print("MinTime " + mintime);
+          print(givenTime);
+          print("maxtime " + maxtime);
           CompareNote(givenPitch, i);
           rHasMissed = i;  //accounts for duplicates
         }
@@ -678,7 +675,7 @@ function RhythmScore(){
   rhythmicScore = score/hitArrray.length * 100;
 
   totalRhythmScore += rhythmicScore;
-  print(rhythmicScore);
+  print("Rhythm Score: " + rhythmicScore);
 
 }
 
@@ -699,7 +696,7 @@ function PitchScore(){
   }
   pitchBasedScore = pScore/hitPitches.length * 100;
   totalPitchScore += pitchBasedScore;
-  print(pitchBasedScore);
+  print("Pitch Score: " + pitchBasedScore);
   print("Missed Pitches: " + missedPitch);
 }
 //Overall scores throughout the level
@@ -715,6 +712,7 @@ function PRScores(){
   //Was this a perfect round?
   if(rhythmicScore == 100 && pitchBasedScore == 100){
     perfectArray[playCount] = "perfect";
+    print("PERFECT ROUND!!");
   }
 
 }
@@ -732,7 +730,8 @@ function PassiveMetronome(){
   //CUE DOWNBEAT METRO VISUALS HERE
   print("Metronome downbeat");
 }
-
+//Moved to top level stage-specific script - will be deleted from this script after new visuals are stable
+/*
 function SelectRhythm(){
 	var subdivisions = {};
 	subdivisions.subdivisions0 = [1, 1, 1, 1];
@@ -745,7 +744,7 @@ function SelectRhythm(){
 	var rSelected = subdivisions[thisDiv];
 	return rSelected;
 }
-
+*/
 //If the player has played through 4 rounds and has rhythm and pitch scores above 55, they win
 //if the score is not above 55 after 4 rounds, the player continues for 2 more rounds
 //if the player fails to reach this score after 6 rounds in total, they fail the level
