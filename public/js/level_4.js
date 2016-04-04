@@ -75,9 +75,7 @@ var v = function(p){
 			p.rectMode(p.CENTER);
 			p.push();
 			p.translate(this.offset, 0);
-			// p.rotate(this.rotation);
 			p.scale(1);
-			// p.triangle(0, (Math.cos(this.oscillation)+4)*20, -this.dimension.x*0.75, this.dimension.y, this.dimension.x*0.75, this.dimension.y);
 			p.rect(this.num*100, height*6, 20, height*12);
 
 			p.pop();
@@ -91,11 +89,8 @@ var v = function(p){
 			p.rectMode(p.CENTER);
 			p.push();
 			p.translate(this.offset, 0);
-			// p.rotate(this.rotation);
 			p.scale(1);
-			// p.triangle(0, (Math.cos(this.oscillation)+4)*20, -this.dimension.x*0.75, this.dimension.y, this.dimension.x*0.75, this.dimension.y);
 			p.rect(this.num*100, height*6, 80, height*16);
-
 			p.pop();
 
 			if(this.reactScaleVal < this.reactScaleThreshold){

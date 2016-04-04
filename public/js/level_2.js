@@ -12,6 +12,8 @@ var v = function(p){
 
 	var canDebug = false;
 
+	var scale_triangle = 2;
+
 	var squaresNum = 18;
 	var squares = [];
 	var squaresRight = [];
@@ -54,10 +56,12 @@ var v = function(p){
 		this.dimension = p.createVector(100+Math.random()*1, 150+Math.random()*20);
 		this.startColor = p.color(Math.random()*55, Math.random()*55, Math.random()*55, 100);
 		this.currentColor = this.startColor;
+
 		if(this.offset < 0)
 			this.targetColor = p.color(Math.random()*55 + 190, Math.random()*55 + 160, Math.random()*55 + 60, 200);
 		else
 			this.targetColor = p.color(Math.random()*55 + 230, Math.random()*55 + 140, Math.random()*55 + 180, 200);
+
 		this.alpha = 50;
 		this.colorVal = 0;
 		this.colorInc = 0.1;
@@ -75,13 +79,13 @@ var v = function(p){
 			p.rectMode(p.CENTER);
 			p.push();
 			p.translate(this.offset, 0);
-			
+
 			if(this.t == 0)
 			p.rotate(this.rotation);
 			else
 			p.rotate(-this.rotation);
 
-			p.scale(2);
+			p.scale(scale_triangle);
 			if(this.t == 0)
 				p.triangle(0, (Math.cos(this.oscillation)+4)*20, -this.dimension.x*0.75, this.dimension.y, this.dimension.x*0.75, this.dimension.y);
 			else
@@ -98,13 +102,11 @@ var v = function(p){
 			p.push();
 			p.translate(this.offset, 0);
 			p.rotate(this.rotation);
-			p.scale(2);
+			p.scale(scale_triangle);
 			if(this.t == 0)
-			p.triangle(0, (Math.cos(this.oscillation)+4)*20, -this.dimension.x*0.75-(this.reactScaleVal*0.5), this.dimension.y+this.reactScaleVal, this.dimension.x*0.75+(this.reactScaleVal*0.5), this.dimension.y+this.reactScaleVal);
+				p.triangle(0, (Math.cos(this.oscillation)+4)*20, -this.dimension.x*0.75-(this.reactScaleVal*0.5), this.dimension.y+this.reactScaleVal, this.dimension.x*0.75+(this.reactScaleVal*0.5), this.dimension.y+this.reactScaleVal);
 			else
-			p.triangle(0, (Math.cos(-this.oscillation)+4)*20, -this.dimension.x*0.75-(this.reactScaleVal*0.5), this.dimension.y+this.reactScaleVal, this.dimension.x*0.75+(this.reactScaleVal*0.5), this.dimension.y+this.reactScaleVal);
-			// var middle = p.createVector(0, this.dimension.y);
-			//p.line(0, 0, middle.x, middle.y);
+				p.triangle(0, (Math.cos(-this.oscillation)+4)*20, -this.dimension.x*0.75-(this.reactScaleVal*0.5), this.dimension.y+this.reactScaleVal, this.dimension.x*0.75+(this.reactScaleVal*0.5), this.dimension.y+this.reactScaleVal);
 			p.pop();
 
 			if(this.reactScaleVal < this.reactScaleThreshold){

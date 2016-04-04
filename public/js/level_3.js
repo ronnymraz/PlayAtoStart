@@ -76,7 +76,6 @@ var v = function(p){
 			p.push();
 			p.rotate(this.rotation*0.01*this.num);
 			p.scale(3);
-			// p.triangle(0, (Math.cos(this.oscillation)+4)*20, -this.dimension.x*0.75, this.dimension.y, this.dimension.x*0.75, this.dimension.y);
 			p.rect(noise(millis()*0.0001, this.num)*800-400, noise(millis()*0.0001, this.num), 100, 100);
 			p.pop();
 		}
@@ -90,7 +89,6 @@ var v = function(p){
 			p.push();
 			p.rotate(this.rotation*0.01*this.num);
 			p.scale(3);
-			// p.triangle(0, (Math.cos(this.oscillation)+4)*20, -this.dimension.x*0.75, this.dimension.y, this.dimension.x*0.75, this.dimension.y);
 			p.rect(noise(millis()*0.0005, this.num)*1200-800, noise(millis()*0.0005, this.num), 100, 100);
 			p.pop();
 
