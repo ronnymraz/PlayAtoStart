@@ -561,7 +561,7 @@ function WarmUpCorrectNotes(givenPitch){
 function CheckWarmup(){
   console.log("Checking warmup!");
   for(var j = 0; j < trackWarmUp.length; j++){
-    //console.log("Warmup number: " + j);
+    console.log("Warmup number: " + trackWarmUp[j]);
     if(trackWarmUp[j] > warmupNum){
       if(j == trackWarmUp.length - 1){
         console.log("Warmup Complete!");
