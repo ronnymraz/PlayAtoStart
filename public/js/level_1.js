@@ -12,7 +12,7 @@ var v = function(p){
 
 	var canDebug = false;
 
-	var squaresNum = 18;
+	var squaresNum = 27;
 	var squares = [];
 	var squaresRight = [];
 	var polygons = [];
@@ -47,16 +47,16 @@ var v = function(p){
 		this.offset = offset;
 		this.rotation = possibleRotations[num];
 		this.oscillation = 0;
-		this.globalRotationInc = 0.001;
+		this.globalRotationInc = 0.005;
 		this.positionX = (Math.random()+1)*600;
 		this.positionY = Math.random()*100;
-		this.dimension = p.createVector(100+Math.random()*1, 200+Math.random()*20);
-		this.startColor = p.color(Math.random()*55, Math.random()*55, Math.random()*55, 100);
+		this.dimension = p.createVector(100+Math.random()*60, 250+Math.random()*10);
+		this.startColor = p.color(Math.random()*5, Math.random()*10, Math.random()*5, 100);
 		this.currentColor = this.startColor;
 		if(this.offset < 0)
-			this.targetColor = p.color(Math.random()*55 + 190, Math.random()*55 + 160, Math.random()*55 + 60, 200);
+			this.targetColor = p.color(Math.random()*55 + 190, Math.random()*55 + 160, Math.random()*55 + 60, 100);
 		else
-			this.targetColor = p.color(Math.random()*55 + 230, Math.random()*55 + 140, Math.random()*55 + 180, 200);
+			this.targetColor = p.color(Math.random()*55 + 0, Math.random()*55 + 51, Math.random()*153 + 30, 100);
 		this.alpha = 50;
 		this.colorVal = 0;
 		this.colorInc = 0.1;
@@ -75,7 +75,7 @@ var v = function(p){
 			p.push();
 			p.translate(this.offset, 0);
 			p.rotate(this.rotation);
-			p.scale(0.5);
+			p.scale(2);
 			p.triangle(0, (Math.cos(this.oscillation)+4)*20, -this.dimension.x*0.75, this.dimension.y, this.dimension.x*0.75, this.dimension.y);
 			p.pop();
 		}
@@ -89,7 +89,7 @@ var v = function(p){
 			p.push();
 			p.translate(this.offset, 0);
 			p.rotate(this.rotation);
-			p.scale(0.5);
+			p.scale(2.0);
 			p.triangle(0, (Math.cos(this.oscillation)+4)*20, -this.dimension.x*0.75-(this.reactScaleVal*0.5), this.dimension.y+this.reactScaleVal, this.dimension.x*0.75+(this.reactScaleVal*0.5), this.dimension.y+this.reactScaleVal);
 			var middle = p.createVector(0, this.dimension.y);
 			//p.line(0, 0, middle.x, middle.y);
@@ -170,14 +170,9 @@ var v = function(p){
 
 			notesHit++;
 
-			if(note == 'A'){
+			if(note == 'D'){
 				canChange[pickRandomIndex()] = true;
 				stroke_a = 200;
-			}
-
-			if(note == 'G'){
-				canChange[pickRandomIndex()] = true;
-				stroke_g = 200;
 			}
 
 			canHandleNote = false;
@@ -228,7 +223,7 @@ var v = function(p){
 		p.rect(-p.width*0.325, -p.height*0.3, p.width*0.1, p.height*0.1);
 		p.fill(255);
 		p.noStroke();
-		p.text('G', -p.width*0.275, -p.height*0.25);
+		p.text('D', -p.width*0.275, -p.height*0.25);
 
 		if(stroke_a > 0)
 			stroke_a -= 5;
@@ -335,7 +330,8 @@ var v = function(p){
 
 		drawBeat();
 		drawNotes();
-		drawBody();
+		//this is the monster
+		// drawBody();
 
 		p.scale(0.25);
 		for(var i = 0; i < squaresNum; i++){
@@ -354,7 +350,8 @@ var v = function(p){
 			squaresRight[i].show();
 		}
 
-		drawCharacter();
+		//this is the human!
+		// drawCharacter();
 
 		p.scale(2.75);
 		if(canDebug){
@@ -387,10 +384,11 @@ var v = function(p){
 }
 function SelectRhythm(){
 	var subdivisions = {};
-	subdivisions.subdivisions0 = [1, 1, 1, 1];
-	subdivisions.subdivisions1 = [2, 2, 2, 2, 2, 2, 1];
-	subdivisions.subdivisions2 = [2, 2, 1, 2, 2, 1];
-	subdivisions.subdivisions3 = [1, 2, 2, 1, 1];
+	subdivisions.subdivisions0 = [1, 2, 1, 2, 1, 1, 1, 1, 1,];
+	subdivisions.subdivisions1 = [1, 1, 2, 2, 1, 1, 1, 2, 2, 1];
+	subdivisions.subdivisions2 = [2, 2, 2, 2, 1, 1, 2, 2, 2, 2, 1, 1];
+	subdivisions.subdivisions3 = [1, 1, 1, 1, 1, 1, 1, 1];
+
 	var numSubdivisions = 3;
 	var pickDiv = Math.floor(Math.random()*((numSubdivisions) - 0)) + 1;
 	var thisDiv = 'subdivisions' + pickDiv;

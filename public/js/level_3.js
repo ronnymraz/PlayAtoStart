@@ -48,21 +48,21 @@ var v = function(p){
 		this.offset = offset;
 		this.rotation = possibleRotations[num];
 		this.oscillation = 0;
-		this.globalRotationInc = 0.001;
-		this.positionX = (Math.random()+1)*600;
+		this.globalRotationInc = 0.006;
+		this.positionX = (Math.random()+1)*80;
 		this.positionY = Math.random()*100;
-		this.dimension = p.createVector(100+Math.random()*1, 200+Math.random()*20);
-		this.startColor = p.color(Math.random()*55, Math.random()*55, Math.random()*55, 100);
+		this.dimension = p.createVector(100+Math.random()*1, 50+Math.random()*600);
+		this.startColor = p.color(Math.random()*5, Math.random()*10, Math.random()*0, 150);//RGB random, 100=opacity
 		this.currentColor = this.startColor;
 		if(this.offset < 0)
-			this.targetColor = p.color(Math.random()*55 + 190, Math.random()*55 + 160, Math.random()*55 + 60, 200);
+			this.targetColor = p.color(Math.random()*55 + 100, Math.random()*55 + 100, Math.random()*55 + 60, 200);
 		else
 			this.targetColor = p.color(Math.random()*55 + 230, Math.random()*55 + 140, Math.random()*55 + 180, 200);
 		this.alpha = 50;
 		this.colorVal = 0;
 		this.colorInc = 0.1;
 
-		this.reactAlpha = 255;
+		this.reactAlpha = 400;
 		this.reactScaleVal = 0;
 		this.reactScaleInc = 6;
 		this.reactScaleThreshold = 200;
@@ -75,8 +75,9 @@ var v = function(p){
 			p.rectMode(p.CENTER);
 			p.push();
 			p.rotate(this.rotation*0.01*this.num);
-			p.scale(3);
-			p.rect(noise(millis()*0.0001, this.num)*800-400, noise(millis()*0.0001, this.num), 100, 100);
+			p.scale(1);// size of squares
+			// p.triangle(0, (Math.cos(this.oscillation)+4)*20, -this.dimension.x*0.75, this.dimension.y, this.dimension.x*0.75, this.dimension.y);
+			p.rect(noise(millis()*0.0001, this.num)*160-400, noise(millis()*0.0001, this.num), 100, 100);//*400=size of the eye
 			p.pop();
 		}
 
@@ -88,7 +89,8 @@ var v = function(p){
 			p.rectMode(p.CENTER);
 			p.push();
 			p.rotate(this.rotation*0.01*this.num);
-			p.scale(3);
+			p.scale(0.5);
+			// p.triangle(0, (Math.cos(this.oscillation)+4)*20, -this.dimension.x*0.75, this.dimension.y, this.dimension.x*0.75, this.dimension.y);
 			p.rect(noise(millis()*0.0005, this.num)*1200-800, noise(millis()*0.0005, this.num), 100, 100);
 			p.pop();
 
@@ -177,6 +179,11 @@ var v = function(p){
 				stroke_g = 200;
 			}
 
+			if(note == 'G'){
+				canChange[pickRandomIndex()] = true;
+				stroke_g = 200;
+			}
+
 			canHandleNote = false;
 			handleNoteStartTime = p.millis();
 		}
@@ -211,7 +218,7 @@ var v = function(p){
 	drawNotes = function(){
 		p.textSize(18);
 		p.textAlign(p.CENTER, p.CENTER);
-		p.fill(5, 184, 117);
+		p.fill(255, 255, 255);
 		p.stroke(255, stroke_a);
 		p.strokeWeight(10);
 		p.rect(-p.width*0.45, -p.height*0.3, p.width*0.1, p.height*0.1);
@@ -219,7 +226,7 @@ var v = function(p){
 		p.noStroke();
 		p.text('D', -p.width*0.4, -p.height*0.25);
 
-		p.fill(5, 184, 117);
+		p.fill(255, 255, 255);
 		p.stroke(255, stroke_g);
 		p.strokeWeight(10);
 		p.rect(-p.width*0.325, -p.height*0.3, p.width*0.1, p.height*0.1);
@@ -308,7 +315,7 @@ var v = function(p){
 			// squaresRight[i].show();
 		}
 
-		drawCharacter();
+		//drawCharacter();
 
 		p.scale(2.75);
 		if(canDebug){
@@ -342,10 +349,10 @@ var v = function(p){
 
 function SelectRhythm(){
 	var subdivisions = {};
-	subdivisions.subdivisions0 = [1, 1, 1, 1];
-	subdivisions.subdivisions1 = [2, 2, 2, 2, 2, 2, 1];
-	subdivisions.subdivisions2 = [2, 2, 1, 2, 2, 1];
-	subdivisions.subdivisions3 = [1, 2, 2, 1, 1];
+	subdivisions.subdivisions0 = [2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1];
+	subdivisions.subdivisions1 = [1, 1, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1];
+	subdivisions.subdivisions2 = [2, 1, 1, 2, 1, 2, 1, 1, 2, 1];
+	subdivisions.subdivisions3 = [1, 1, 1, 2, 1, 1, 2, 1, 1];
 	var numSubdivisions = 3;
 	var pickDiv = Math.floor(Math.random()*((numSubdivisions) - 0)) + 1;
 	var thisDiv = 'subdivisions' + pickDiv;

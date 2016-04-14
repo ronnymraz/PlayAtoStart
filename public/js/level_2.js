@@ -12,9 +12,7 @@ var v = function(p){
 
 	var canDebug = false;
 
-	var scale_triangle = 2;
-
-	var squaresNum = 18;
+	var squaresNum = 48; //number of triangles
 	var squares = [];
 	var squaresRight = [];
 	var polygons = [];
@@ -51,17 +49,17 @@ var v = function(p){
 		this.rotation = possibleRotations[num];
 		this.oscillation = 0;
 		this.globalRotationInc = 0.001;
-		this.positionX = (Math.random()+1)*600;
-		this.positionY = Math.random()*100;
-		this.dimension = p.createVector(100+Math.random()*1, 150+Math.random()*20);
-		this.startColor = p.color(Math.random()*55, Math.random()*55, Math.random()*55, 100);
+		this.positionX = (Math.random()+5)*100;
+		this.positionY = Math.random()*100; 
+		this.dimension = p.createVector(100+Math.random()*40, 200+Math.random()*200);
+		//this.dimension = p.createVector(150+Math.random()*10, 150+Math.random()*10);//vector and size of total triangles
+		this.startColor = p.color(Math.random()*0, Math.random()*10, Math.random()*10, 100);//RGB random, 100=opacity
+		//this.startColor = p.color(Math.random()*20, Math.random()*100, Math.random()*55, 100); green-ish
 		this.currentColor = this.startColor;
-
 		if(this.offset < 0)
-			this.targetColor = p.color(Math.random()*55 + 190, Math.random()*55 + 160, Math.random()*55 + 60, 200);
+			this.targetColor = p.color(Math.random()*55 + 40, Math.random()*55 + 92, Math.random()*55 + 34, 110);
 		else
-			this.targetColor = p.color(Math.random()*55 + 230, Math.random()*55 + 140, Math.random()*55 + 180, 200);
-
+			this.targetColor = p.color(Math.random()*55 + 255, Math.random()*55 + 204, Math.random()*55 + 51, 110);
 		this.alpha = 50;
 		this.colorVal = 0;
 		this.colorInc = 0.1;
@@ -73,23 +71,26 @@ var v = function(p){
 
 		this.show = function(){
 			this.rotation += this.globalRotationInc;
-			this.oscillation += this.globalRotationInc*40;
+			this.oscillation += this.globalRotationInc*20;
 			p.fill(this.currentColor);
 			p.noStroke();
 			p.rectMode(p.CENTER);
 			p.push();
 			p.translate(this.offset, 0);
-
+			
 			if(this.t == 0)
 			p.rotate(this.rotation);
 			else
 			p.rotate(-this.rotation);
 
-			p.scale(scale_triangle);
+			p.scale(2); //size of triangles
 			if(this.t == 0)
 				p.triangle(0, (Math.cos(this.oscillation)+4)*20, -this.dimension.x*0.75, this.dimension.y, this.dimension.x*0.75, this.dimension.y);
-			else
-				p.triangle(0, (Math.cos(-this.oscillation)+4)*20, -this.dimension.x*0.75, this.dimension.y, this.dimension.x*0.75, this.dimension.y);
+
+			//second group /else
+            //p.triangle(0, (Math.cos(-this.oscillation)+4)*20, -this.dimension.x*0.50, this.dimension.y, this.dimension.x*0.70
+          	//, this.dimension.y);
+
 			p.pop();
 		}
 
@@ -102,11 +103,13 @@ var v = function(p){
 			p.push();
 			p.translate(this.offset, 0);
 			p.rotate(this.rotation);
-			p.scale(scale_triangle);
+			p.scale(2.8);
 			if(this.t == 0)
-				p.triangle(0, (Math.cos(this.oscillation)+4)*20, -this.dimension.x*0.75-(this.reactScaleVal*0.5), this.dimension.y+this.reactScaleVal, this.dimension.x*0.75+(this.reactScaleVal*0.5), this.dimension.y+this.reactScaleVal);
+			p.triangle(0, (Math.cos(this.oscillation)+4)*20, -this.dimension.x*0.50-(this.reactScaleVal*0.5), this.dimension.y+this.reactScaleVal, this.dimension.x*0.50+(this.reactScaleVal*0.5), this.dimension.y+this.reactScaleVal);
 			else
-				p.triangle(0, (Math.cos(-this.oscillation)+4)*20, -this.dimension.x*0.75-(this.reactScaleVal*0.5), this.dimension.y+this.reactScaleVal, this.dimension.x*0.75+(this.reactScaleVal*0.5), this.dimension.y+this.reactScaleVal);
+			p.triangle(0, (Math.cos(-this.oscillation)+4)*20, -this.dimension.x*0.50-(this.reactScaleVal*0.5), this.dimension.y+this.reactScaleVal, this.dimension.x*0.50+(this.reactScaleVal*0.5), this.dimension.y+this.reactScaleVal);
+			var middle = p.createVector(0, this.dimension.y);
+			p.line(0, 0, middle.x, middle.y);
 			p.pop();
 
 			if(this.reactScaleVal < this.reactScaleThreshold){
@@ -228,7 +231,7 @@ var v = function(p){
 	drawNotes = function(){
 		p.textSize(18);
 		p.textAlign(p.CENTER, p.CENTER);
-		p.fill(5, 184, 117);
+		p.fill(183, 183, 183);
 		p.stroke(255, stroke_a);
 		p.strokeWeight(10);
 		p.rect(-p.width*0.45, -p.height*0.3, p.width*0.1, p.height*0.1);
@@ -236,7 +239,7 @@ var v = function(p){
 		p.noStroke();
 		p.text('D', -p.width*0.4, -p.height*0.25);
 
-		p.fill(5, 184, 117);
+		p.fill(183, 183, 183);
 		p.stroke(255, stroke_g);
 		p.strokeWeight(10);
 		p.rect(-p.width*0.325, -p.height*0.3, p.width*0.1, p.height*0.1);
@@ -329,7 +332,7 @@ var v = function(p){
 			squaresRight[i].show();
 		}
 
-		drawCharacter();
+		//drawCharacter(); this is the hero!
 
 		p.scale(2.75);
 		if(canDebug){
@@ -363,10 +366,10 @@ var v = function(p){
 
 function SelectRhythm(){
 	var subdivisions = {};
-	subdivisions.subdivisions0 = [1, 1, 1, 1];
-	subdivisions.subdivisions1 = [2, 2, 2, 2, 2, 2, 1];
-	subdivisions.subdivisions2 = [2, 2, 1, 2, 2, 1];
-	subdivisions.subdivisions3 = [1, 2, 2, 1, 1];
+	subdivisions.subdivisions0 = [1, 2, 1, 2, 1, 1, 2, 1, 2, 1];
+	subdivisions.subdivisions1 = [2, 2, 2, 1, 2, 1, 2, 2, 2, 1, 2, 1];
+	subdivisions.subdivisions2 = [2, 1, 1, 2, 1, 2, 1, 1, 2, 1];
+	subdivisions.subdivisions3 = [1, 1, 1, 2, 1, 1, 2, 1, 1];
 	var numSubdivisions = 3;
 	var pickDiv = Math.floor(Math.random()*((numSubdivisions) - 0)) + 1;
 	var thisDiv = 'subdivisions' + pickDiv;

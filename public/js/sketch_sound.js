@@ -32,7 +32,7 @@ var source, fft, lowPass;
 
 
 
-var threshold = 0.15;//alter amplitude threshold
+var threshold = 0.25;//alter amplitude threshold
 var cutoff = 0;
 var decayRate = 0.95;
 //array of absolute fundamentals
@@ -147,10 +147,9 @@ function preload(){
     bg = loadImage('../assets/levels/'+levelStage+'.jpg');
   }
 
-  hiHatAnalog = loadSound('../assets/samples/hihat-analog.wav');
-  hihatDigital = loadSound('../assets/samples/hihat-digital.wav');//used for metronome, not included in sample array
-  kickAcoustic = loadSound('../assets/samples/kick-acoustic01.wav');
-  snare = loadSound('../assets/samples/snare-808.wav');
+  drumSticks = loadSound('../assets/samples/countin.wav');//used for metronome, not included in sample array
+  subbyKick2 = loadSound('../assets/samples/SUBBYKICKV2.wav');
+  subbyKick3 = loadSound('../assets/samples/SUBBYKICKV3.wav');
 }
 
 function windowResized(){
@@ -204,12 +203,10 @@ function setup() {
     rMissedArray = new Array(timeStampArray.length);
     pitchHit = new Array(acceptedPitches.length);
 
-
-    // hiHatAnalog = loadSound('../assets/samples/hihat-analog.wav');
-    // hihatDigital = loadSound('../assets/samples/hihat-digital.wav');//used for metronome, not included in sample array
-    // kickAcoustic = loadSound('../assets/samples/kick-acoustic01.wav');
-    // snare = loadSound('../assets/samples/snare-808.wav');
-    samples = [snare, kickAcoustic, hiHatAnalog];
+    //drumSticks = loadSound('../assets/samples/countin.wav'); count in only
+    //subbyKick2 = loadSound('../assets/samples/SUBBYKICKV2.wav');
+    //subbyKick3 = loadSound('../assets/samples/SUBBYKICKV3.wav');
+    samples = [subbyKick2, subbyKick3];
     countInMetro = setInterval(function() { counting(); }, countInTempo);
     timerListenNote = 50;
     console.log(acceptedPitches.length);
@@ -424,7 +421,7 @@ function counting(){
     clearInterval(countInMetro);
   }else if (countingint == 4){
     print ("Count in: " + countingint);
-    hihatDigital.play();
+    drumSticks.play();
     startTime = Date.now();
     PopulateTimestamps();
     //isCountingIn = false;
@@ -434,7 +431,7 @@ function counting(){
     countingint++;
   }else{
     print ("Count in: " + countingint);
-    hihatDigital.play();
+    drumSticks.play();
     countingint++;
   }
 
@@ -498,14 +495,13 @@ else{
 *on a missed rhythm
 */
 function CompareNote(givenPitch, hasMissed){
-  print("You Played a: " + givenPitch);
+  print(givenPitch);
   if(hasMissed == rHasMissed){
     return;
   }
   for(var i = 0; i < hitPitches.length; i ++){
     if(TrackHitPitches(givenPitch) && hitPitches[i] != "hit"){
       hitPitches[i] = "hit";
-      print("Pitch Hit!");
       //INITIALIZE POSSITIVE VISUALS
       handleCorrectNote(givenPitch);
       return;
@@ -517,7 +513,7 @@ function CompareNote(givenPitch, hasMissed){
 
   }
   //NOTHING HAPPENS
-  print("Missed pitch");
+  print("Pitch missed");
   //TODO we need a way to bypass rhythm tracking for debug purposes
 }
 
@@ -545,7 +541,7 @@ function WarmUpCorrectNotes(givenPitch){
       //This integer index corresponds to the visual progress bar
       trackWarmUp[i] += 1;
       console.log("Warmup Pitch is Correct! " + givenPitch);
-      //console.log(trackWarmUp[i]);
+      console.log(trackWarmUp[i]);
     }else{
       console.log("Incorrecct Warmup Pitch " + givenPitch);
     }
@@ -561,7 +557,7 @@ function WarmUpCorrectNotes(givenPitch){
 function CheckWarmup(){
   console.log("Checking warmup!");
   for(var j = 0; j < trackWarmUp.length; j++){
-    console.log("Warmup number: " + trackWarmUp[j]);
+    console.log("Warmup number: " + j);
     if(trackWarmUp[j] > warmupNum){
       if(j == trackWarmUp.length - 1){
         console.log("Warmup Complete!");
@@ -595,11 +591,11 @@ function CheckTimestamp(givenTime, givenPitch){
       //print(givenTime);
       //print(timeStampArray[i]);
       //WHEN USING THIS DATA FOR VISUALS, HIT WOULD BE RETURNED INSTEAD OF PRINTED TO THE CONSOLE
-      //print(i);
+      print(i);
       print("Rhythm hit!");
-      //print("MinTime " + mintime);
-      //print(givenTime);
-      //print("maxtime " + maxtime);
+      print("MinTime " + mintime);
+      print(givenTime);
+      print("maxtime " + maxtime);
       CompareNote(givenPitch, i);
       break;
 
@@ -614,10 +610,10 @@ function CheckTimestamp(givenTime, givenPitch){
         }
         else if(i == timeStampArray.length - 1){
           print("Rhythm missed!");
-          //print(i);
-          //print("MinTime " + mintime);
-          //print(givenTime);
-          //print("maxtime " + maxtime);
+          print(i);
+          print("MinTime " + mintime);
+          print(givenTime);
+          print("maxtime " + maxtime);
           CompareNote(givenPitch, i);
           rHasMissed = i; //accounts for duplicates
           break;
@@ -625,9 +621,9 @@ function CheckTimestamp(givenTime, givenPitch){
         else{
           print(i);
           print("Rhythm missed!");
-          //print("MinTime " + mintime);
-          //print(givenTime);
-          //print("maxtime " + maxtime);
+            print("MinTime " + mintime);
+          print(givenTime);
+          print("maxtime " + maxtime);
           CompareNote(givenPitch, i);
           rHasMissed = i;  //accounts for duplicates
         }
@@ -754,19 +750,18 @@ function NewSession(){
   print("Running Rhythm Score = " + runningRhythmScore);
   print("Running Pitch Score = " + runningPitchScore);
   if(playCount == 4 && runningRhythmScore >= 55 && runningPitchScore >= 55){
-    print("Level Complete! Great Job!")
+    print("Complete!")
     var perectRhythms = ScanPerfect();
     print("You Had " + perectRhythms + " perfect rounds!");
-    //print("RhythmScore = " + runningRhythmScore + "PitchScore = " + runningPitchScore );
+    print("RhythmScore = " + runningRhythmScore + "PitchScore = " + runningPitchScore );
   }
   else if(playCount == 6 && runningRhythmScore >= 55 && runningPitchScore >= 55){
-    print(" Level Complete! Great Job!")
+    print("Complete!")
     var perectRhythms = ScanPerfect();
     print("You Had " + perectRhythms + " perfect rounds!");
   }
   else if(playCount >= 6 && (runningRhythmScore <= 55 || runningPitchScore != 55)){
-    //print("Level Failed! RhythmScore = " + runningRhythmScore + "PitchScore = " + runningPitchScore);
-    print("Great round, but you can do better! Try this level again!");
+    print("Level Failed! RhythmScore = " + runningRhythmScore + "PitchScore = " + runningPitchScore);
 
   }
   //reset variables for a new round
@@ -807,7 +802,7 @@ function Restart(){
   thisDiv = 'subdivisions' + pickDiv;
   */
   thisRhythm = SelectRhythm();
-  //print(thisDiv);
+  print(thisDiv);
   //create our array of accepted timestamps as they correspond to this subdivision
   timeStampArray = new Array(thisRhythm.length);
   hitArrray = new Array(timeStampArray.length);
@@ -816,11 +811,10 @@ function Restart(){
   pitchHit = new Array(acceptedPitches.length);
 
 
-  hiHatAnalog= loadSound('hihat-analog.wav');
-  hihatDigital = loadSound('hihat-digital.wav');//used for metronome, not included in sample array
-  kickAcoustic = loadSound('kick-acoustic01.wav');
-  snare = loadSound('snare-808.wav');
-  samples = [snare, kickAcoustic, hiHatAnalog];
+  drumSticks = loadSound('../assets/samples/countin.wav');
+  subbyKick2 = loadSound('../assets/samples/SUBBYKICKV2.wav');
+  subbyKick3 = loadSound('../assets/samples/SUBBYKICKV3.wav');
+  samples = [subbyKick2, subbyKick3];
   countInMetro = setInterval(function() { counting(); }, countInTempo);
   timerListenNote = 50;
   console.log(acceptedPitches.length);

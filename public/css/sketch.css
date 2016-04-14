@@ -1,6 +1,10 @@
+head{
+	padding: 1;
+}	
+
 body{
-	padding: 0;
-	margin: 0;
+	padding: 1;
+	margin: 1;
 	font-family: Trebuchet MS;
 }
 
@@ -9,8 +13,8 @@ canvas{
 }
 
 a{
-	margin-left: 30%;
-	margin-right: 30%;
+	margin-left: 40%;
+	margin-right: 40%;
 	text-align: center;
 	color: white;
 }
