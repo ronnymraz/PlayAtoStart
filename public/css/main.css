@@ -45,12 +45,23 @@ h1{
 #center{
     
     
-    position:fixed;
-    text-align: center;
-    top:40vh;
-width:100vw;
-    letter-spacing:10px;
+    position:relative;
     
+   
+}
+
+
+#centerChild{
+    
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 50%;
+    height: 30%;
+    margin: auto;
+ 
 }
 
 #center-top{
@@ -58,7 +69,7 @@ width:100vw;
     font-size:.8em;
     opacity:.7;
     position:fixed;
-    text-align: center;
+
     top:2vh;
 width:100vw;
     letter-spacing:10px;
@@ -74,13 +85,23 @@ width:100vw;
 
 body{
 	text-align: center;
-	background-color: rgb(255, 255, 253);
+background-image:url('../assets/Home/bg.jpg');
+    background-size:cover;
+    background-position:center;
 	font-family: Trebuchet MS;
 }
 
 #title{
 	margin-top: 10%;
 	font-size: 3.3em;
+}
+
+#mainTitle{
+    border: solid 2px;
+  
+     padding:20px;
+    
+    
 }
 
 #subtitle{
