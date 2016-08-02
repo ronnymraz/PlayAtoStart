@@ -106,7 +106,7 @@ body{
 
 a{
 font-family: 'VT323';
-    font-size:2em;
+    font-size:2.5em;
     text-decoration:none;
     color:#999999;
     transition-duration:.3s;
@@ -119,15 +119,18 @@ canvas{
 #footer{
     position:fixed;
     bottom:0px; 
-    width:95vw;
-    padding-left:20px;
-    padding-right:40px;
+    width:100vw;
+   float:center;
+    
   margin-bottom:20px;
+
 }
 
 .linkRight{
-    display:inline-block;
+    display:inline;
     float:right;
+    
+    margin-right:100px;
     
 }
 .linkRight:hover{
@@ -136,25 +139,97 @@ canvas{
     transition-duration:.3s;
 }
 
-.linkRight:hover > #arrow{
+.linkRight:hover > #space{
     
 
-        margin-left:20px;
+    letter-spacing:2em;
 }
 
-#arrow{
+.link:hover{
+    opacity:.6;
     
+    
+}
+
+#space{
+    
+    font-size:.2em;
+    transition-duration:.2s;
+    transition-timing-function:ease-in;
+}
+#arrow{
+
+
+    font-size:2.5em;
+
+  
     color:#999999; 
-    transition-duration:.3s;
+
     
 }
 
 .linkLeft{    
      display:inline-block;
     float:left;
+     margin-left:100px;
 }
 
 a:hover{
-    font-size:2.5em;
+   
     cursor:pointer;
 }
+
+.floating{
+ 
+    -webkit-animation-name: Floatingx;
+    -webkit-animation-duration: 3s;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-timing-function: ease-in-out;
+    -moz-animation-name: Floating;
+    -moz-animation-duration: 3s;
+    -moz-animation-iteration-count: infinite;
+    -moz-animation-timing-function: ease-in-out;
+    margin-left: 30px;
+    margin-top: 5px;
+
+}
+
+
+@-webkit-keyframes Floatingx{
+    from {-webkit-transform:translate(0, 0px);}
+    65% {-webkit-transform:translate(0, 15px);}
+    to {-webkit-transform: translate(0, -0px);    }    
+}
+    
+@-moz-keyframes Floating{
+    from {-moz-transform:translate(0, 0px);}
+    65% {-moz-transform:translate(0, 15px);}
+    to {-moz-transform: translate(0, -0px);}    
+}
+
+
+.scaling{
+    
+    -webkit-animation-name: scalex;
+    -webkit-animation-duration:3s;
+    -webkit-animation-iteration-count:infinite;
+    -webkit-animation-timing-function:ease-in-out;
+    -moz-animation-name: scale;
+    -moz-animation-duration:3s;
+    -moz-animation-iteration-count:infinite;
+    -moz-animation-timing-function:ease-in-out;
+}
+    
+    @-webkit-keyframes scalex{
+        from {-webkit-transform: scale(0.9);}
+        65% {-webkit-transform: scale(1.0);}
+        to {-webkit-transform: scale(0.9);}    
+    }
+        
+    @-moz-keyframes scale{
+        from {-moz-transform: scale(0.9);}
+        65% {-moz-transform: scale(1.0);}
+        to {-moz-transform: scale(0.9);}    
+    }
+
+

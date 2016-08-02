@@ -8,6 +8,8 @@
   <!-- uncomment lines below to include extra p5 libraries -->
 <script language="javascript" src="js/p5.dom.js"></script>
 <script language="javascript" src="js/p5.sound.js"></script>
+    <script   src="https://code.jquery.com/jquery-3.1.0.min.js"   integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s="   crossorigin="anonymous"></script>
+    <script language="javascript" src="js/home.js"></script>
 <!-- <script language="javascript" type="text/javascript" src="js/sketch_sound.js"></script>
 <script language="javascript" type="text/javascript" src="js/sketch_visuals.js"></script> -->
   <!-- this line removes any default padding and style. you might only need one of these values set. -->
@@ -21,7 +23,7 @@
     <div id="center">
         
         
-        <h1>PLAY <span class="teal">A</span> TO START</h1>
+        <h1 class = "floating" id="mainTitle">PLAY <span class="teal">A</span> TO START</h1>
     
     
     </div>
@@ -29,8 +31,8 @@
     
 
 	<div id="footer">
-	   <a class="bottomLink linkLeft" href="howto.html">RULES</a>
-        <a class = "bottomLink linkRight" href="map.html">GO<span id="arrow">></span></a>
+	   <a class="link bottomLink linkLeft" href="howto.html">RULES</a>
+        <a class = "bottomLink linkRight" href="map.html">GO<span id=space>&nbsp;&nbsp;</span>></a>
 	</div>
 </body>
 </html>
