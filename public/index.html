@@ -3,6 +3,7 @@
   <meta charset="UTF-8">
   <title>music game</title>
   <link href='css/main.css' rel='stylesheet' type='text/css' />
+    <link href='https://fonts.googleapis.com/css?family=VT323' rel='stylesheet' type='text/css'>
   <script language="javascript" type="text/javascript" src="js/p5.js"></script>
   <!-- uncomment lines below to include extra p5 libraries -->
 <script language="javascript" src="js/p5.dom.js"></script>
@@ -13,12 +14,23 @@
 </head>
 <body>
 
-<img src="assets/landing.jpg" alt="map" style="width:1366px;height:768px;">
+<!--<img src="assets/landing.jpg" alt="map" style="width:1366px;height:768px;">-->
 
-	</div>
+    
+    
+    <div id="center">
+        
+        
+        <h1>PLAY <span class="teal">A</span> TO START</h1>
+    
+    
+    </div>
+    
+    
+
 	<div id="footer">
-		<span class="howto"><a href="howto.html">RULES</a></span>
-		<span class="map"><a href="map.html">GO</a></span>
+	   <a class="bottomLink linkLeft" href="howto.html">RULES</a>
+        <a class = "bottomLink linkRight" href="map.html">GO<span id="arrow">></span></a>
 	</div>
 </body>
 </html>

@@ -99,7 +99,7 @@ var v = function(p){
 			p.push();
 			p.translate(this.dimension.x, this.dimension.y);
 			// p.rotate(this.rotation);
-			p.scale(0.5);
+			p.scale(2.27);
 			p.ellipse(0, 0, 100, 100);
 			// p.triangle(0, (Math.cos(this.oscillation)+4)*20, -this.dimension.x*0.75, this.dimension.y, this.dimension.x*0.75, this.dimension.y);
 			p.pop();

@@ -231,7 +231,7 @@ function draw() {
      if(!isCountingIn && !playExample && !hasScored && !warmup){//are we done counting in? start checking rhythm
       //print("passsed threshold");
         if(waitForCountIn){
-          waitForCountIn = false;
+          //waitForCountIn = false;
           isCountingIn = true;
           var countInTempo = (60/bpm)*1000;
           countInMetro = setInterval(function() { counting(); }, countInTempo);
@@ -470,12 +470,12 @@ else{
   if(playExample){
       playExample = false;
       isCountingIn = false;
-      waitForCountIn = true;
+      //waitForCountIn = true;
       countingint = 1;
       divcounter = 0;
       clearInterval(setPassiveMetronome);
       var countInTempo = (60/bpm)*1000;
-      //countInMetro = setInterval(function() { counting(); }, countInTempo);
+      countInMetro = setInterval(function() { counting(); }, countInTempo);
     }
     else{
       playCount++;

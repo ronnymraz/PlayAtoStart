@@ -1,6 +1,78 @@
+*{
+    margin:0;
+    padding:0;
+    font-family: 'VT323';
+}
+
+.teal{
+    
+    color:#02fea6;
+  
+}
+
+#stageCenter{
+    margin-top:10%;
+    vertical-align:middle;
+    display:inline-block;
+    width:100vw;
+    
+    
+    
+}
+.stageSelection{
+    
+    width:40%;
+    display:block;
+  
+    opacity:.4;
+    margin-left: auto;
+    margin-right: auto;
+    transition-duration:.3s;
+}
+
+.stageSelection:hover{
+ width:50%;   
+    opacity:1;
+}
+
+h1{
+    font-size:4em!important;
+    
+    
+    color:#999999;
+}
+
+#center{
+    
+    
+    position:fixed;
+    text-align: center;
+    top:40vh;
+width:100vw;
+    letter-spacing:10px;
+    
+}
+
+#center-top{
+    
+    font-size:.8em;
+    opacity:.7;
+    position:fixed;
+    text-align: center;
+    top:2vh;
+width:100vw;
+    letter-spacing:10px;
+    z-index:100000;
+    
+}
+
+
+@font-face {
+    font-family: orator;
+    src: url(sansation_light.woff);
+}
+
 body{
-	margin-right: 1%;
-	margin-left: 1%;
 	text-align: center;
 	background-color: rgb(255, 255, 253);
 	font-family: Trebuchet MS;
@@ -33,11 +105,56 @@ body{
 }
 
 a{
-	color: black;
-
-	margin-top: 5px;
+font-family: 'VT323';
+    font-size:2em;
+    text-decoration:none;
+    color:#999999;
+    transition-duration:.3s;
 }
 
 canvas{
 	z-index: -1;
+}
+
+#footer{
+    position:fixed;
+    bottom:0px; 
+    width:95vw;
+    padding-left:20px;
+    padding-right:40px;
+  margin-bottom:20px;
+}
+
+.linkRight{
+    display:inline-block;
+    float:right;
+    
+}
+.linkRight:hover{
+    
+    color:#02fea6;
+    transition-duration:.3s;
+}
+
+.linkRight:hover > #arrow{
+    
+
+        margin-left:20px;
+}
+
+#arrow{
+    
+    color:#999999; 
+    transition-duration:.3s;
+    
+}
+
+.linkLeft{    
+     display:inline-block;
+    float:left;
+}
+
+a:hover{
+    font-size:2.5em;
+    cursor:pointer;
 }

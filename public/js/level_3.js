@@ -55,9 +55,9 @@ var v = function(p){
 		this.startColor = p.color(Math.random()*5, Math.random()*10, Math.random()*0, 150);//RGB random, 100=opacity
 		this.currentColor = this.startColor;
 		if(this.offset < 0)
-			this.targetColor = p.color(Math.random()*55 + 100, Math.random()*55 + 100, Math.random()*55 + 60, 200);
+			this.targetColor = p.color(Math.random()*55 + 128, Math.random()*55 + 212, Math.random()*55 + 255, 150);
 		else
-			this.targetColor = p.color(Math.random()*55 + 230, Math.random()*55 + 140, Math.random()*55 + 180, 200);
+			this.targetColor = p.color(Math.random()*55 + 102, Math.random()*55 + 0, Math.random()*55 + 204, 150);
 		this.alpha = 50;
 		this.colorVal = 0;
 		this.colorInc = 0.1;

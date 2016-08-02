@@ -57,9 +57,9 @@ var v = function(p){
 		//this.startColor = p.color(Math.random()*20, Math.random()*100, Math.random()*55, 100); green-ish
 		this.currentColor = this.startColor;
 		if(this.offset < 0)
-			this.targetColor = p.color(Math.random()*55 + 40, Math.random()*55 + 92, Math.random()*55 + 34, 110);
+			this.targetColor = p.color(Math.random()*55 + 255, Math.random()*55 + 51, Math.random()*55 + 0, 110);
 		else
-			this.targetColor = p.color(Math.random()*55 + 255, Math.random()*55 + 204, Math.random()*55 + 51, 110);
+			this.targetColor = p.color(Math.random()*55 + 102, Math.random()*55 + 0, Math.random()*55 + 34, 110);
 		this.alpha = 50;
 		this.colorVal = 0;
 		this.colorInc = 0.1;
