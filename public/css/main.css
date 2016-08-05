@@ -98,11 +98,16 @@ background-image:url('../assets/Home/bg.jpg');
 }
 
 #mainTitle{
-    border: solid 2px;
+    border: solid 10px;
   
      padding:20px;
+    transition-duration:.5s;
     
+}
+
+#mainTitle:hover{
     
+    background-color:rgba(2, 254, 166, 0.17);
 }
 
 #subtitle{
