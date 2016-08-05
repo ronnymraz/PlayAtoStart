@@ -1,7 +1,7 @@
 *{
     margin:0;
     padding:0;
-    font-family: 'VT323';
+   font-family: 'Share Tech Mono', sans-serif;
 }
 
 .teal{
@@ -80,7 +80,7 @@ width:100vw;
 
 
 @font-face {
-    font-family: orator;
+/*    font-family: orator;*/
     src: url(sansation_light.woff);
 }
 
@@ -89,7 +89,7 @@ body{
 background-image:url('../assets/Home/bg.jpg');
     background-size:cover;
     background-position:center;
-	font-family: Trebuchet MS;
+/*	font-family: Trebuchet MS;*/
 }
 
 #title{
@@ -132,7 +132,7 @@ background-image:url('../assets/Home/bg.jpg');
 }
 
 a{
-font-family: 'VT323';
+/*font-family: 'VT323';*/
     font-size:2.5em;
     text-decoration:none;
     color:#999999;
