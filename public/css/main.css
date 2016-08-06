@@ -1,0 +1,262 @@
+*{
+    margin:0;
+    padding:0;
+   font-family: 'Share Tech Mono', sans-serif;
+}
+
+.teal{
+    
+    color:#02fea6;
+  
+}
+
+#stageCenter{
+    margin-top:10%;
+    vertical-align:middle;
+    display:inline-block;
+    width:100vw;
+    
+    
+    
+}
+.stageSelection{
+    
+    width:30%;
+    display:block;
+  
+    opacity:.6;
+    margin-left: auto;
+    margin-right: auto;
+    transition-duration:.5s;
+}
+
+.stageSelection:hover{
+ width:35%;   
+    opacity:1;
+}
+
+h1{
+    font-size:2em!important;
+    
+    
+    color:#999999;
+}
+
+#center{
+    
+    
+    position:relative;
+    
+   
+}
+
+
+#centerChild{
+    
+    position: absolute;
+    top: 70vh;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 50%;
+    height: 30%;
+    margin: auto;
+
+ 
+}
+
+#center-top{
+    
+    font-size:.8em;
+    opacity:.7;
+    position:fixed;
+
+    top:2vh;
+width:100vw;
+    letter-spacing:10px;
+    z-index:100000;
+    
+}
+
+
+@font-face {
+/*    font-family: orator;*/
+    src: url(sansation_light.woff);
+}
+
+body{
+	text-align: center;
+//background-image:url('../assets/Home/bg.jpg');
+    background-size:cover;
+    background-position:center;
+/*	font-family: Trebuchet MS;*/
+}
+
+#title{
+	margin-top: 10%;
+	font-size: 3.3em;
+}
+
+//#mainTitle{
+    border: solid 10px;
+  
+     padding:20px;
+    transition-duration:.5s;
+    
+}
+
+//#mainTitle:hover{
+    
+    background-color:rgba(2, 254, 166, 0.17);
+}
+
+#subtitle{
+	margin-top: 2%;
+	margin-bottom: 10%;
+	font-size: 1.25em;
+	font-style: italic;
+}
+
+#levelsContainer{
+	background-color: rgb(200, 243, 234);
+}
+
+.about{
+	text-align: right;
+	float: right;
+}
+
+.howto{
+	text-align: left;
+	float: left;
+}
+
+a{
+/*font-family: 'VT323';*/
+    font-size:1.5em;
+    text-decoration:none;
+    color:#999999;
+    transition-duration:.3s;
+}
+
+canvas{
+	z-index: -1;
+}
+
+#footer{
+    position:fixed;
+    bottom:0px; 
+    width:100vw;
+   float:center;
+    
+  margin-bottom:20px;
+
+}
+
+.linkRight{
+    display:inline;
+    float:right;
+    
+    margin-right:100px;
+    
+}
+.linkRight:hover{
+    
+    color:#02fea6;
+    transition-duration:.3s;
+}
+
+.linkRight:hover > #space{
+    
+
+    letter-spacing:2em;
+}
+
+.link:hover{
+    opacity:.6;
+    
+    
+}
+
+#space{
+    
+    font-size:.2em;
+    transition-duration:.2s;
+    transition-timing-function:ease-in;
+}
+#arrow{
+
+
+    font-size:2.5em;
+
+  
+    color:#999999; 
+
+    
+}
+
+.linkLeft{    
+     display:inline-block;
+    float:left;
+     margin-left:100px;
+}
+
+a:hover{
+   
+    cursor:pointer;
+}
+
+//.floating{
+ 
+    -webkit-animation-name: Floatingx;
+    -webkit-animation-duration: 3s;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-timing-function: ease-in-out;
+    -moz-animation-name: Floating;
+    -moz-animation-duration: 3s;
+    -moz-animation-iteration-count: infinite;
+    -moz-animation-timing-function: ease-in-out;
+    margin-left: 30px;
+    margin-top: 5px;
+
+}
+
+
+@-webkit-keyframes Floatingx{
+    from {-webkit-transform:translate(0, 0px);}
+    65% {-webkit-transform:translate(0, 15px);}
+    to {-webkit-transform: translate(0, -0px);    }    
+}
+    
+@-moz-keyframes Floating{
+    from {-moz-transform:translate(0, 0px);}
+    65% {-moz-transform:translate(0, 15px);}
+    to {-moz-transform: translate(0, -0px);}    
+}
+
+
+.scaling{
+    
+    -webkit-animation-name: scalex;
+    -webkit-animation-duration:3s;
+    -webkit-animation-iteration-count:infinite;
+    -webkit-animation-timing-function:ease-in-out;
+    -moz-animation-name: scale;
+    -moz-animation-duration:3s;
+    -moz-animation-iteration-count:infinite;
+    -moz-animation-timing-function:ease-in-out;
+}
+    
+    @-webkit-keyframes scalex{
+        from {-webkit-transform: scale(0.9);}
+        65% {-webkit-transform: scale(1.0);}
+        to {-webkit-transform: scale(0.9);}    
+    }
+        
+    @-moz-keyframes scale{
+        from {-moz-transform: scale(0.9);}
+        65% {-moz-transform: scale(1.0);}
+        to {-moz-transform: scale(0.9);}    
+    }
+
+

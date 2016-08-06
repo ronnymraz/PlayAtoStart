@@ -1,0 +1,21 @@
+head{
+	padding: 1;
+}	
+
+body{
+	padding: 1;
+	margin: 1;
+	font-family: Trebuchet MS;
+}
+
+canvas{
+	z-index: -1;
+}
+
+a{
+	margin-left: 40%;
+	margin-right: 40%;
+	text-align: center;
+	color: white;
+}
+
